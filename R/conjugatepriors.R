@@ -43,5 +43,27 @@ unigausscp = function(data, priormean, priorvar, n = NULL, invgamma = F, V0 = NU
 }
 
 
+unigausscpiterative = function(data, priormean, priorvar, n, invgamma = F, V0 = NULL, a0 = NULL, b0 = NULL){
+  dataweight = rep(0, length(data))
+  postmeans = rep(0, length(data))
+  postvar = rep(0, length(data))
+  postsd = rep(0, length(data))
+  if(invgamma = F){
+    for(i in 1:length(data)){
+      out = unigausscp(data[i], priormean, priorvar, n[i])
+      postmeans[i] = out$priormean
+      postvar[i] = out$priorvar
+      priorsd[i] = out$priorsd
+      dataweight[i] = out$dataweight
+      priormean = out$priormean
+      priorvar = out$priorvar
+      
+    }
+  }
+  if(invgamma = T){
+    #complete later
+    return(1)
+  }
+}
 
 
