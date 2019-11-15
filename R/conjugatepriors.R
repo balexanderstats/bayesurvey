@@ -50,7 +50,7 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL,  n = NULL, invg
 #' Iterative Gaussian Conjugate Prior
 #' This function iteratives over a set of data.  The posterior becomes the new prior for the next data point
 #'
-#' @param data- data for analysis
+#' @param data data for analysis
 #' @param priormean - intial prior mean
 #' @param priorvar initial prior variance
 #' @param datavar a vector of the variance for each data point

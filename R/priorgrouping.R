@@ -6,9 +6,9 @@
 #'
 #' @param election_data the election data in df form. The first column must contain the name of that state
 #' @param cutoffs the cutoffs used to split the data into the categories
+#' @param groupnames 
 #' @param weights optional weights for a weighted average
-#' @param a character vector of names 
-#' This function splits the data into categories based on the average of the margin, democratic vote, or difference 
+#'
 #' @return
 #' @export
 #'

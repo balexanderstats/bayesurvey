@@ -9,6 +9,8 @@ unigausscpiterative(data, priormean, priorvar, datavar = NULL, n,
   invgamma = F, V0 = NULL, a0 = NULL, b0 = NULL)
 }
 \arguments{
+\item{data}{data for analysis}
+
 \item{priormean}{- intial prior mean}
 
 \item{priorvar}{initial prior variance}
@@ -24,8 +26,6 @@ unigausscpiterative(data, priormean, priorvar, datavar = NULL, n,
 \item{a0}{initial a0}
 
 \item{b0}{inital b0}
-
-\item{data-}{data for analysis}
 }
 \description{
 Iterative Gaussian Conjugate Prior

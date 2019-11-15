@@ -13,10 +13,9 @@ getpriorassign(election_data, cutoffs = c(-0.2, -0.1, -0.025, 0.025, 0.1,
 
 \item{cutoffs}{the cutoffs used to split the data into the categories}
 
-\item{weights}{optional weights for a weighted average}
+\item{groupnames}{}
 
-\item{a}{character vector of names 
-This function splits the data into categories based on the average of the margin, democratic vote, or difference}
+\item{weights}{optional weights for a weighted average}
 }
 \description{
 Title
