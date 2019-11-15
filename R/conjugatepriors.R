@@ -24,7 +24,7 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL,  n = NULL, invg
     datavar = var(data)
   }
   datamean =  mean(data)
-  if(invgamma = F){
+  if(invgamma == F){
     #this does just a gaussian - gaussian conjugate prior assuming sigma is known or fixed
     datavar = var(data)
     postmean = priormean * (datavar / (n * priorvar + datavar)) + datamean * (n * priorvar)/(n * priorvar + datavar)
@@ -34,7 +34,7 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL,  n = NULL, invg
     dataweight = (n * priorvar)/(n * priorvar + datavar)
   
     }
-  if(invgamma = T){
+  if(invgamma == T){
     #adds a prior distribution and posterior of sigma
     postvar = 1/(1/v0 + n)
     postmean = (priormean/priorvar + n * datamean)/postV
@@ -74,7 +74,7 @@ unigausscpiterative = function(data, priormean, priorvar, datavar = NULL, n, inv
   if(is.null(datavar)){
     datavar = (data*(1-data))/n
   }
-  if(invgamma = F){
+  if(invgamma == F){
     for(i in 1:length(data)){
       out = unigausscp(data[i], priormean, priorvar, datavar = datavar[i], n[i])
       postmeans[i] = out$priormean
@@ -87,7 +87,7 @@ unigausscpiterative = function(data, priormean, priorvar, datavar = NULL, n, inv
     }
     
   }
-  if(invgamma = T){
+  if(invgamma == T){
     for(u in 1:length(data)){
       out = unigausscp(data[i], priormean, priorvar, datavar, n, invgamma, V0, a0, b0)
       postmeans[i] = out$priormean
