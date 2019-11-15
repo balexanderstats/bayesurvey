@@ -13,7 +13,7 @@ fitnormalvecMLE <- function(data){
     stop("data must be a vector")
   }
   mean = mean(data)
-  var = (length(data) - 1)var(data)/length(data) # var uses n-1 so we must multiply by (n-1)/n to get MLE
+  var = (length(data) - 1) * var(data)/length(data) # var uses n-1 so we must multiply by (n-1)/n to get MLE
   return(list(mean = mean, var = var))
 }
 
@@ -32,6 +32,6 @@ fitbetavecMOM <-function(data){
   datamean =  mean(data)
   datavar = var(data)
   a = (datamean^2(1-datamean)-datavar*datamean)/datavar
-  b = a(1-datamean)/datamean
+  b = a * (1-datamean)/datamean
   return(list(a = a, b = b))
 }
