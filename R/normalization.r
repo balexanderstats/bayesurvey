@@ -2,8 +2,6 @@
 
 
 
-#proportional normalization of data frames
-#takes a data 
 #' Proportional Normalization of data frame
 #' 
 #' Takes a data frame and normalizes it such that the rowSum is one
@@ -12,7 +10,12 @@
 #' @return A data frame that is proportionally normalized
 #' @export
 #'
-#' @examples
+#' @examples 
+#' df1 = data.frame(a = c(0.4, 0.3, .35, .45), b = c(.45, .40, .40, .3))
+#' propnorm(df1)
+#' 
+#' df2  = data.frame(a = c(0.3, .34, .38), b = c(0.2, 0.21, 0.25), c = c(.45, .42, .41))
+#' propnorm(df2)
 propnorm <- function(data){
   if(!is.data.frame(data) && !is.matrix(data)){
     stop("data is not matrix or data frame")
@@ -27,10 +30,15 @@ propnorm <- function(data){
 #' @param df data frame to be  
 #' @param columns a vector of columns to be normalized
 #'
-#' @return a new data frame with the normalized data added with column names ending in normalized
+#' @return a new data frame with both original and the normalized data with column names ending in normalized
 #' @export
 #'
 #' @examples
+#' #' df1 = data.frame(a = c(0.4, 0.3, .35, .45), b = c(.45, .40, .40, .3))
+#' propnormdf(df1)
+#' 
+#' df2  = data.frame(a = c(0.3, .34, .38), b = c(0.2, 0.21, 0.25), c = c(.45, .42, .41))
+#' propnormdf(df2)
 propnormdf <- function(df, columns){
   data = df[columns]
   normdata = propnorm(data)
