@@ -8,6 +8,11 @@
 #' @export
 #'
 #' @examples
+#' set.seed(1)
+#' data1  = rnorm(100)
+#' fitnormalvecMLE(data1)
+#' data2 = rnorm(100, mean  = .5, sd = 0.03)
+#' fitnormalvecMLE(data2, logit = T)
 fitnormalvecMLE <- function(data){
   if(!is.vector(data)){
     stop("data must be a vector")
@@ -27,11 +32,16 @@ fitnormalvecMLE <- function(data){
 #' @export
 #'
 #' @examples
+#' set.seed(2)
+#' data1 = rbeta(100, 1, 1)
+#' fitbetavecMOM(data1)
+#' data2 = rbeta(100, 43, 27)
+#' fitbetavecMOM(data2)
 fitbetavecMOM <-function(data){
   
   datamean =  mean(data)
   datavar = var(data)
-  a = (datamean^2(1-datamean)-datavar*datamean)/datavar
+  a = (datamean^2*(1-datamean)-datavar*datamean)/datavar
   b = a * (1-datamean)/datamean
   return(list(a = a, b = b))
 }
