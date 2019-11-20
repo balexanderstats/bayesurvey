@@ -17,3 +17,10 @@ a list with the elements mean with the mean of the distribution and
 MLE estimates of a Normal Distribution
 Fits a normal
 }
+\examples{
+set.seed(1)
+data1  = rnorm(100)
+fitnormalvecMLE(data1)
+data2 = rnorm(100, mean  = .5, sd = 0.03)
+fitnormalvecMLE(data2, logit = T)
+}

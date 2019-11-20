@@ -17,3 +17,10 @@ The fitted a,b of a beta(a,b) distribtion
 Beta Method of Moments
 Calculates the method of monements estimators of a beta distribution fitted to the data
 }
+\examples{
+set.seed(2)
+data1 = rbeta(100, 1, 1)
+fitbetavecMOM(data1)
+data2 = rbeta(100, 43, 27)
+fitbetavecMOM(data2)
+}

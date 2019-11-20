@@ -4,28 +4,40 @@
 \alias{unigausscp}
 \title{Title}
 \usage{
-unigausscp(data, priormean, priorvar, datavar = NULL, n = NULL,
-  invgamma = F, V0 = NULL, a0 = NULL, b0 = NULL)
+unigausscp(data, priormean, priorvar, datavar = NULL, singlepoll = F,
+  n = NULL, invgamma = F, a0 = NULL, b0 = NULL)
 }
 \arguments{
 \item{data}{a vector  of the data or a single point}
 
 \item{priormean}{mean of prior distribution}
 
-\item{priorvar}{variance of prior distribution}
+\item{priorvar}{variance of prior distribution if invgamma is not true, shift parameter for variance if invgamma is true}
 
-\item{datavar}{datavariance,  if null var is called to estimate it}
+\item{datavar}{data variance,  if null var is called to estimate it}
 
-\item{n}{sample size}
+\item{singlepoll}{if true it calculates the variance based on the sample size}
+
+\item{n}{approriate sample size}
 
 \item{invgamma}{a logical indicator of whether or not a inverse gamma prior for sigma is (T) or isn't included}
 
-\item{V0}{prior V0 where the likelihood is N(priormean)}
+\item{a0}{prior a if invgamma is T}
 
-\item{a0}{prior a if gamma is T}
-
-\item{b0}{prior b if gamma is T}
+\item{b0}{prior b if invgamma is T}
 }
 \description{
 Title
+}
+\examples{
+set.seed(10)
+data1 = rnorm(30, mean = .48, sd = 0.05)
+n1 = floor(runif(1, 200, 800))
+datavar1 = mean(sqrt(data1[1]*(1-data1[1])/n1))
+unigausscp(data1, 0.5, 0.05)
+unigausscp(data1[1], 0.5, 0.05, singlepoll = T, n = n1)
+unigausscp(data1, 0.5, 0.05, invgamma = T, a0 = 0.0001, b0 = 0.0001)
+unigausscp(data1[1], 0.5, 0.05, singlepoll = T, n = n1, invgamma = T, a0 = 0.0001, b0 = 0.0001)
+
+
 }

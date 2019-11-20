@@ -6,7 +6,7 @@
 This function iteratives over a set of data.  The posterior becomes the new prior for the next data point}
 \usage{
 unigausscpiterative(data, priormean, priorvar, datavar = NULL, n,
-  invgamma = F, V0 = NULL, a0 = NULL, b0 = NULL)
+  invgamma = F, a0 = NULL, b0 = NULL)
 }
 \arguments{
 \item{data}{data for analysis}
@@ -21,8 +21,6 @@ unigausscpiterative(data, priormean, priorvar, datavar = NULL, n,
 
 \item{invgamma}{a logical indicator of whether or not a inverse gamma prior for sigma is (T) or isn't included}
 
-\item{V0}{initial v0}
-
 \item{a0}{initial a0}
 
 \item{b0}{inital b0}
@@ -30,4 +28,11 @@ unigausscpiterative(data, priormean, priorvar, datavar = NULL, n,
 \description{
 Iterative Gaussian Conjugate Prior
 This function iteratives over a set of data.  The posterior becomes the new prior for the next data point
+}
+\examples{
+set.seed(12)
+data1 = c(rnorm(10, mean = .48, sd = 0.05), rnorm(20, mean = .49, sd = 0.05),  rnorm(20, mean = .51, sd = 0.05))
+n = floor(runif(50, 200, 800))
+unigausscpiterative(data1, 0.5, 0.05, n = n) 
+unigausscpiterative(data1, 0.5, 0.05, n = n, invgamma = T, a0 = 0.0001, b0 = 0.0001)
 }
