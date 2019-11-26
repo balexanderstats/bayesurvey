@@ -4,7 +4,7 @@
 #' Fits a normal 
 #' @param data - a vector of data
 #'
-#' @return a list with the elements mean with the mean of the distribution and 
+#' @return a list with the elements: mean with the mean of the distribution and var with the variance of the distribution.
 #' @export
 #'
 #' @examples
@@ -28,7 +28,7 @@ fitnormalvecMLE <- function(data){
 #' Calculates the method of monements estimators of a beta distribution fitted to the data
 #' @param data - a vector of data 
 #'
-#' @return The fitted a,b of a beta(a,b) distribtion
+#' @return A list with the elements a and b which are the parameters of a beta(a,b) distribution.
 #' @export
 #'
 #' @examples

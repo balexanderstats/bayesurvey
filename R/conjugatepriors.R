@@ -12,7 +12,7 @@
 #' @param a0 prior a if invgamma is T
 #' @param b0 prior b if invgamma is T
 #'
-#' @return
+#' @return A list with the following components:  priormean: the prior mean, priorvar: the prior var, a0: the prior of the inverse gamma distribution if invgamma is true, b0: the prior of the inverse gamma distribution if invgamma is true, n: which is the sample size if supplied,  datavar: which is the variance of the data if it is supplied, invgamma: which states if the inverse gamma prior was used, postmean: which is the posterior mean, postvar: which is the posterior variance, postsd: which is the posterior standard deviation, posta: which is the posterior a of a inverse gamma (a,b), and postb: which is the posterior of b of a inverse gamma(a, b), and dataweight: a scalar of the weight of the data over the prior. 
 #' @export
 #'
 #' @examples
@@ -69,7 +69,7 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = F,
 
 
 #' Iterative Gaussian Conjugate Prior
-#' This function iteratives over a set of data.  The posterior becomes the new prior for the next data point
+#' It iterates over the data and calls the function unigausscp for each point, setting the new prior as the posterior from the last data point.
 #'
 #' @param data data for analysis
 #' @param priormean - intial prior mean
@@ -80,7 +80,7 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = F,
 #' @param a0 initial a0
 #' @param b0 inital b0
 #'
-#' @return
+#' @return A list with the following elements: finalpostmean: a scalar of the final mean of the posterior, finalpostvar: the final posterior variance, finalpostsd: the final posterior standard deviation, dataweights: a vector of the weight of the data in the posterior, postmeans: a vector of the posterior means for each data point, postvar:  a vector of the posterior variance for each data point, postsds: a vector of the posterior standard deviations for each data point, posta: a vector of the posterior values of a if invgamma = T, and postb:  a vector of the posterior values of b in invgamma = T.
 #' @export
 #'
 #' @examples
