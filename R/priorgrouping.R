@@ -55,7 +55,6 @@ getpriorassign = function(election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1,
 #' @param election_data 
 #' @param cutoffs 
 #' @param groupnames 
-#' @param yearweight weights the columns differently 
 #'
 #' @return
 #' @export
@@ -75,7 +74,7 @@ getpriorassign = function(election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1,
 #' addcategorytopolls(propnormpolls1, 30, 18, electdata)
 #' addcategorytopolls(propnormpolls2, 30, 18, electdata, cutoffs = c(-.15, -.1, -0.05, 0.05, .1, .15))
 
-addcategorytopolls = function(poll_data, proploc, stateloc, election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1, .2), groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue", "Strong Blue"), yearweight = NULL){
+addcategorytopolls = function(poll_data, proploc, stateloc, election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1, .2), groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue", "Strong Blue")){
   assignment = getpriorassign(election_data, cutoffs, groupnames)
   categories  = length(groupnames)
   priormean = rep(NA, categories)
