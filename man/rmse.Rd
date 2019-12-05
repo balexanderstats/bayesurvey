@@ -15,7 +15,7 @@ rmse(predicted, actual)
 the Root Mean Square Error
 }
 \description{
-This function calculates the root mean square error and checks that the idenifiers match.
+This function calculates the root mean square error and checks that the idenifiers match. Note that if n=1, then the root mean square error is equivalent to the average error.
 }
 \examples{
 predict1 = data.frame(state = c("TX", "GA", "OR"), dem = c(.45, .49, .63), rep = c(.55, .51, .37))

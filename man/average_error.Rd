@@ -2,7 +2,7 @@
 % Please edit documentation in R/errorcalculation.R
 \name{average_error}
 \alias{average_error}
-\title{Average Error
+\title{Average Error by State
 This function calculates the average error and checks that the idenifiers match.}
 \usage{
 average_error(predicted, actual)
@@ -13,10 +13,10 @@ average_error(predicted, actual)
 \item{actual}{the real result including the first column with a character vector}
 }
 \value{
-the average error
+This function returns the average error for each state.
 }
 \description{
-Average Error
+Average Error by State
 This function calculates the average error and checks that the idenifiers match.
 }
 \examples{

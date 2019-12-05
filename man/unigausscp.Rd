@@ -2,7 +2,8 @@
 % Please edit documentation in R/conjugatepriors.R
 \name{unigausscp}
 \alias{unigausscp}
-\title{Title}
+\title{Univariate Iterative Gaussian Conjugate Prior
+This function takes a vector of proportions and iteratives over it applying a gaussian conjugate prior calculation at each point, and using the posterior as the new prior in the next iteration.}
 \usage{
 unigausscp(data, priormean, priorvar, datavar = NULL, singlepoll = F,
   n = NULL, invgamma = F, a0 = NULL, b0 = NULL)
@@ -30,7 +31,8 @@ unigausscp(data, priormean, priorvar, datavar = NULL, singlepoll = F,
 A list with the following components:  priormean: the prior mean, priorvar: the prior var, a0: the prior of the inverse gamma distribution if invgamma is true, b0: the prior of the inverse gamma distribution if invgamma is true, n: which is the sample size if supplied,  datavar: which is the variance of the data if it is supplied, invgamma: which states if the inverse gamma prior was used, postmean: which is the posterior mean, postvar: which is the posterior variance, postsd: which is the posterior standard deviation, posta: which is the posterior a of a inverse gamma (a,b), and postb: which is the posterior of b of a inverse gamma(a, b), and dataweight: a scalar of the weight of the data over the prior.
 }
 \description{
-Title
+Univariate Iterative Gaussian Conjugate Prior
+This function takes a vector of proportions and iteratives over it applying a gaussian conjugate prior calculation at each point, and using the posterior as the new prior in the next iteration.
 }
 \examples{
 set.seed(10)
