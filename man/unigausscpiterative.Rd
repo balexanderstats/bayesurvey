@@ -3,36 +3,33 @@
 \name{unigausscpiterative}
 \alias{unigausscpiterative}
 \title{Iterative Gaussian Conjugate Prior
-This function iteratives over a set of data.  The posterior becomes the new prior for the next data point}
+It iterates over the data and calls the function unigausscp for each point, setting the new prior as the posterior from the last data point.}
 \usage{
-unigausscpiterative(data, priormean, priorvar, datavar = NULL, n,
-  invgamma = F, a0 = NULL, b0 = NULL)
+unigausscpiterative(data, priormean, priorvar, datavar = NULL, n)
 }
 \arguments{
 \item{data}{data for analysis}
 
 \item{priormean}{- intial prior mean}
 
-\item{priorvar}{initial prior variance}
+\item{priorvar}{initial prior variance, if inverse gamma is desired this is the initial V0 parameter of the}
 
 \item{datavar}{a vector of the variance for each data point}
 
 \item{n}{a vector of sample sizes}
-
-\item{invgamma}{a logical indicator of whether or not a inverse gamma prior for sigma is (T) or isn't included}
-
-\item{a0}{initial a0}
-
-\item{b0}{inital b0}
+}
+\value{
+A list with the following elements: finalpostmean: a scalar of the final mean of the posterior, finalpostvar: the final posterior variance, finalpostsd: the final posterior standard deviation, dataweights: a vector of the weight of the data in the posterior, postmeans: a vector of the posterior means for each data point, postvar:  a vector of the posterior variance for each data point, postsds: a vector of the posterior standard deviations for each data point, posta: a vector of the posterior values of a if invgamma = T, and postb:  a vector of the posterior values of b in invgamma = T.
 }
 \description{
 Iterative Gaussian Conjugate Prior
-This function iteratives over a set of data.  The posterior becomes the new prior for the next data point
+It iterates over the data and calls the function unigausscp for each point, setting the new prior as the posterior from the last data point.
 }
 \examples{
 set.seed(12)
 data1 = c(rnorm(10, mean = .48, sd = 0.05), rnorm(20, mean = .49, sd = 0.05),  rnorm(20, mean = .51, sd = 0.05))
 n = floor(runif(50, 200, 800))
-unigausscpiterative(data1, 0.5, 0.05, n = n) 
-unigausscpiterative(data1, 0.5, 0.05, n = n, invgamma = T, a0 = 0.0001, b0 = 0.0001)
+unigausscpiterative(data1, 0.5, 0.05, n = n)
+data2 = c(rnorm(50, mean = 0.5, 0.05))
+unigausscpiterative(data2, 0.5, 0.05, n = n)
 }

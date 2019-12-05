@@ -26,6 +26,9 @@ unigausscp(data, priormean, priorvar, datavar = NULL, singlepoll = F,
 
 \item{b0}{prior b if invgamma is T}
 }
+\value{
+A list with the following components:  priormean: the prior mean, priorvar: the prior var, a0: the prior of the inverse gamma distribution if invgamma is true, b0: the prior of the inverse gamma distribution if invgamma is true, n: which is the sample size if supplied,  datavar: which is the variance of the data if it is supplied, invgamma: which states if the inverse gamma prior was used, postmean: which is the posterior mean, postvar: which is the posterior variance, postsd: which is the posterior standard deviation, posta: which is the posterior a of a inverse gamma (a,b), and postb: which is the posterior of b of a inverse gamma(a, b), and dataweight: a scalar of the weight of the data over the prior.
+}
 \description{
 Title
 }
@@ -36,8 +39,7 @@ n1 = floor(runif(1, 200, 800))
 datavar1 = mean(sqrt(data1[1]*(1-data1[1])/n1))
 unigausscp(data1, 0.5, 0.05)
 unigausscp(data1[1], 0.5, 0.05, singlepoll = T, n = n1)
-unigausscp(data1, 0.5, 0.05, invgamma = T, a0 = 0.0001, b0 = 0.0001)
-unigausscp(data1[1], 0.5, 0.05, singlepoll = T, n = n1, invgamma = T, a0 = 0.0001, b0 = 0.0001)
+unigausscp(data1, 0.5, 1, invgamma = T, a0 = 0.0001, b0 = 0.0001)
 
 
 }

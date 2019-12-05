@@ -18,7 +18,7 @@ a new data frame with both original and the normalized data with column names en
 Title
 }
 \examples{
-#' df1 = data.frame(a = c(0.4, 0.3, .35, .45), b = c(.45, .40, .40, .3))
+df1 = data.frame(a = c(0.4, 0.3, .35, .45), b = c(.45, .40, .40, .3))
 propnormdf(df1)
 
 df2  = data.frame(a = c(0.3, .34, .38), b = c(0.2, 0.21, 0.25), c = c(.45, .42, .41))

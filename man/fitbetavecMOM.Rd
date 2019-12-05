@@ -11,7 +11,7 @@ fitbetavecMOM(data)
 \item{data}{- a vector of data}
 }
 \value{
-The fitted a,b of a beta(a,b) distribtion
+A list with the elements a and b which are the parameters of a beta(a,b) distribution.
 }
 \description{
 Beta Method of Moments

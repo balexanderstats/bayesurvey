@@ -11,7 +11,7 @@ fitnormalvecMLE(data)
 \item{data}{- a vector of data}
 }
 \value{
-a list with the elements mean with the mean of the distribution and
+a list with the elements: mean with the mean of the distribution and var with the variance of the distribution.
 }
 \description{
 MLE estimates of a Normal Distribution
