@@ -2,21 +2,39 @@
 % Please edit documentation in R/priorgrouping.R
 \name{getpriorassign}
 \alias{getpriorassign}
-\title{Title}
+\title{Prior Assignment
+This function completely fits the Iterative Gaussian Proportional model in Alexander and Ellingson (2019) given raw poll data, election data, and basic parameters.
+Given polling data on congressional districts or senate seats this could make similar predictions.}
 \usage{
 getpriorassign(election_data, cutoffs = c(-0.2, -0.1, -0.025, 0.025, 0.1,
   0.2), groupnames = c("Strong Red", "Red", "Lean Red", "Competitive",
   "Lean Blue", "Blue", "Strong Blue"), weights = NULL)
 }
 \arguments{
-\item{election_data}{the election data in df form. The first column must contain the name of that state}
+\item{election_data}{the election data in df form. The first column must contain the name of that state.}
 
 \item{cutoffs}{the cutoffs used to split the data into the categories}
 
-\item{groupnames}{}
+\item{groupnames}{labels for the categories}
 
-\item{weights}{optional weights for a weighted average}
+\item{weights}{optional weights for a weighted average of the columns}
+}
+\value{
+a data frame with the state in one column and the assignment in the other.
 }
 \description{
-Title
+Prior Assignment
+This function completely fits the Iterative Gaussian Proportional model in Alexander and Ellingson (2019) given raw poll data, election data, and basic parameters.
+Given polling data on congressional districts or senate seats this could make similar predictions.
+}
+\examples{
+require(politicaldata)
+elect2008  = subset(pres_results , year == 2008)
+elect2008$margin = elect2008$dem - elect2008$rep
+elect2012 = subset(pres_results , year == 2012)
+elect2012$margin = elect2012$dem - elect2012$rep
+data = data.frame(state = elect2008$state, 2008 =  elect2008$margin, 2012 = elect2012$margin)
+getpriorassign(data)
+weight = c(0.25,0.75)
+getpriorassign(data , weights = weight)
 }
