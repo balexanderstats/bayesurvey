@@ -2,7 +2,7 @@
 % Please edit documentation in R/errorcalculation.R
 \name{ae_by_state}
 \alias{ae_by_state}
-\title{Root Mean Square Error (RMSE)}
+\title{Average Error by State}
 \usage{
 ae_by_state(predicted, actual)
 }
