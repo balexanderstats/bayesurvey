@@ -1,6 +1,6 @@
 #big model program
 
-#' Title
+#' Iterative Gaussian Conjugate Prior Model for American Election
 #'
 #' @param poll_data a data frame containing all necessary datat
 #' @param stateloc the column number that contains the states for the poll
@@ -13,7 +13,8 @@
 #' @param groupnames  the names of the prior categories
 #' @return a dataframe with the following rows: State with the state, Posterior Mean with the posterior mean, Posterior Variance with the posterior variance, and Posterior Standard Deviation with the posterior standard deviation.
 #' @export
-#'
+#' This function completely fits the Iterative Gaussian Proportional model in Alexander and Ellingson (2019) given raw poll data, election data, and basic parameters.
+#' Given polling data on congressional districts or senate seats this could make similar predictions.
 #' @examples
 #' require(politicaldata)
 #' elect2008  = subset(pres_results , year == 2008)
@@ -69,7 +70,8 @@ iterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidateloc
   return(data.frame("State" = statenames, "Posterior Mean" = postmeans, "Posterior Variance" = postvars, "Posterior Standard Deviation" = postsd))
 }
 
-#' Title
+#' Gaussian Conjugate Prior Model for American Elections
+#' 
 #'
 #' @param poll_data a data frame containing all necessary datat
 #' @param stateloc the column number that contains the states for the poll
@@ -86,7 +88,8 @@ iterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidateloc
 #' @param groupnames  the names of the prior categories
 #' @return a dataframe with the following rows: State with the state, Posterior Mean with the posterior mean, Posterior Variance with the posterior variance, and Posterior Standard Deviation with the posterior standard deviation.
 #' @export
-#'
+#' This function completely fits the Iterative Gaussian Proportional model in Alexander and Ellingson (2019) given raw poll data, election data, and basic parameters.
+#' Given polling data on congressional districts or senate seats this could make similar predictions.
 #' @examples
 #' require(politicaldata)
 #' elect2008  = subset(pres_results , year == 2008)
