@@ -27,9 +27,12 @@
 #' 
 unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = F,  n = NULL, invgamma = F, a0 = NULL, b0 = NULL){
   #checks that n is the number of polls if singlepoll = F
-  if(singlepoll == F & n != length(data)){
-    n = length(data)
+  if(!is.null(n)){
+    if(singlepoll == F  & n != length(data)){
+      n = length(data)
+    }
   }
+  
   #checks if data is a vector
   if(!is.vector(data)){
     stop("Data is not a vector")
