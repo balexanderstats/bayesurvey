@@ -1,7 +1,7 @@
 #conjugate prior functions
 
-#' Title
-#'
+#' Univariate Iterative Gaussian Conjugate Prior
+#' This function takes a vector of proportions and iteratives over it applying a gaussian conjugate prior calculation at each point, and using the posterior as the new prior in the next iteration.
 #' @param data a vector  of the data or a single point
 #' @param priormean mean of prior distribution
 #' @param priorvar variance of prior distribution if invgamma is not true, shift parameter for variance if invgamma is true
@@ -27,7 +27,7 @@
 #' 
 unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = F,  n = NULL, invgamma = F, a0 = NULL, b0 = NULL){
   #checks that n is the number of polls if singlepoll = F
-  if(singlepoll = F & n != length(data)){
+  if(singlepoll == F & n != length(data)){
     n = length(data)
   }
   #checks if data is a vector
@@ -115,7 +115,7 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = F,
 #' n = floor(runif(50, 200, 800))
 #' unigausscpiterative(data1, 0.5, 0.05, n = n)
 #' data2 = c(rnorm(50, mean = 0.5, 0.05))
-#' unigausscpiterative(data2)
+#' unigausscpiterative(data2, 0.5, 0.05, n = n)
 
 unigausscpiterative = function(data, priormean, priorvar, datavar = NULL, n){
   #initialize the vector that stores the dataweight
@@ -127,12 +127,13 @@ unigausscpiterative = function(data, priormean, priorvar, datavar = NULL, n){
   #initialize the vector that stores the posterior standard deviation
   postsds = rep(0, length(data))
   #initalize the vectors for the parameters v, a,b, of a normal-gamma(mean, v, a, b) distribution 
-  posta = rep(a0, length(data))
-  postb = rep(b0, length(data))
-  postv = rep(0, length(data))
   #calculates the variance of the poll if it is not provided
   if(is.null(datavar)){
     datavar = (data*(1-data))/n
+  }
+  
+  if(sum(data > 1) > 1 | sum(data < 0) > 1){
+    stop("The data contains numbers outside of 0 and 1.")
   }
   #iterates over the polls and uses the posterior as the prior in the next iteration
   for(i in 1:length(data)){

@@ -1,15 +1,16 @@
 #data splitting
 
 #' Prior Assignment
+#' This function completely fits the Iterative Gaussian Proportional model in Alexander and Ellingson (2019) given raw poll data, election data, and basic parameters.
+#' Given polling data on congressional districts or senate seats this could make similar predictions.
 #' @param election_data the election data in df form. The first column must contain the name of that state. 
 #' @param cutoffs the cutoffs used to split the data into the categories
 #' @param groupnames labels for the categories
 #' @param weights optional weights for a weighted average of the columns
 #'
-#' @return
+#' @return a data frame with the state in one column and the assignment in the other.
 #' @export
-#' This function completely fits the Iterative Gaussian Proportional model in Alexander and Ellingson (2019) given raw poll data, election data, and basic parameters.
-#' Given polling data on congressional districts or senate seats this could make similar predictions.
+
 #' @examples
 #' require(politicaldata)
 #' elect2008  = subset(pres_results , year == 2008)
@@ -46,16 +47,16 @@ getpriorassign = function(election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1,
 
 
 #' Adds Category assignment to Poll Data 
+#' This function returns a new data frame with a priorcat column to be accessed in other functions.
 #' @param poll_data the data to fit the prior distribution , the first column must be the state name
 #' @param proploc the column the adjusted poll proportion is located
 #' @param stateloc the column the state is located in
 #' @param election_data the election data in df form. The first column must contain the name of that state. 
 #' @param cutoffs the cutoffs used to split the data into the categories
 #' @param groupnames labels for the categories
-#' This function takes the poll data and adds the assigned prior region to the end of the data frame.  It also returns the mean of the prior distributions and the variance of the prior distributions, along with the vector appended to the data frame.
-#' @return
+#' @return poll_data with the prior category appended at the end
 #' @export
-#' This function returns a new data frame with a priorcat column to be accessed in other functions.
+
 #' @examples
 #' require(politicaldata)
 #' elect2008  = subset(pres_results , year == 2008)
