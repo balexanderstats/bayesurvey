@@ -22,14 +22,24 @@
 #' datavar1 = mean(sqrt(data1[1]*(1-data1[1])/n1))
 #' unigausscp(data1, 0.5, 0.05)
 #' unigausscp(data1[1], 0.5, 0.05, singlepoll = T, n = n1)
-#' unigausscp(data1, 0.5, 0.05, invgamma = T, a0 = 0.0001, b0 = 0.0001)
-#' unigausscp(data1[1], 0.5, 0.05, singlepoll = T, n = n1, invgamma = T, a0 = 0.0001, b0 = 0.0001)
+#' unigausscp(data1, 0.5, 1, invgamma = T, a0 = 0.0001, b0 = 0.0001)
 #' 
 #' 
 unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = F,  n = NULL, invgamma = F, a0 = NULL, b0 = NULL){
+  #checks that n is the number of polls if singlepoll = F
+  if(singlepoll = F & n != length(data)){
+    n = length(data)
+  }
+  #checks if data is a vector
+  if(!is.vector(data)){
+    stop("Data is not a vector")
+  }
+  
+  #generates n if not provided
   if(is.null(n)){
     n = length(data)
   }
+  #gets datavar for a single poll or multiple polls if datavar is not provided
   if(is.null(datavar)){
     if(singlepoll == T){
       datavar = sqrt(data*(1-data)/n)
@@ -38,47 +48,63 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = F,
       datavar = var(data)
     }
   }
+  #calcualtes data mean
   datamean =  mean(data)
+  
+  #No inverse gamma prior
   if(invgamma == F){
     #this does just a gaussian - gaussian conjugate prior assuming sigma is known or fixed
+    #calculates posterior mean
     postmean = priormean * (datavar / (n * priorvar + datavar)) + datamean * (n * priorvar)/(n * priorvar + datavar)
+    #calculates posterior variance
     postvar = (n/datavar + 1/priorvar)^-1
-    posta= NULL
+    #returns null for the parameters relating to the invgamma distribution
+    posta = NULL
     postb = NULL
+    postv = NULL
+    #calculates the percent that the data plays in the weighted average of the mean
     dataweight = (n * priorvar)/(n * priorvar + datavar)
+    
+  }
+  # Includes inverse gamma prior
+  #adds a prior distribution and posterior of sigma
   
-    }
   if(invgamma == T){
+    #gets sum(x_i^2) where x_i is each respondent of the polls
     if(singlepoll == T){
       ssqdata = round(datamean * n, 0)
     }
-    #adds a prior distribution and posterior of sigma
+
     if(singlepoll == F){
+      #gets sum(x_i^2) where x_i is the result of a poll
       ssqdata = sum(data^2)
-      }
+    }
+    #calculates posterior for v
     postv = 1/(1/priorvar + n)
+    #calculates posterior for the mean
     postmean = (priormean/priorvar + n * datamean) * postv
+    #calculates posterior a and b
     posta = a0 + n/2
     postb = b0 + 0.5 * (priormean^2 /priorvar + ssqdata - postmean^2/postv)
+    #calculates the posterior variance
     postvar = postb / ((posta - 1)*postv)
+    #calculates the percent that the data plays in the weighted average of the mean
     dataweight = (n/postv)/(n/postv + (priorvar^-1)/postvar)
   }
   postsd = sqrt(postvar)
-  return(list(priormean  = priormean,  priorvar = priorvar, a0 = a0, b0 = b0,  n = n, datavar = datavar, invgamma = invgamma, postmean = postmean, postvar = postvar, postsd = postsd, posta = posta,  postb = postb, dataweight = dataweight))
+  return(list(priormean  = priormean,  priorvar = priorvar, postv = postv, a0 = a0, b0 = b0,  n = n, datavar = datavar, invgamma = invgamma, postmean = postmean, postvar = postvar, postsd = postsd, posta = posta,  postb = postb, dataweight = dataweight))
 }
 
 
 #' Iterative Gaussian Conjugate Prior
 #' It iterates over the data and calls the function unigausscp for each point, setting the new prior as the posterior from the last data point.
-#'
+#' 
 #' @param data data for analysis
 #' @param priormean - intial prior mean
-#' @param priorvar initial prior variance
+#' @param priorvar initial prior variance, if inverse gamma is desired this is the initial V0 parameter of the 
 #' @param datavar a vector of the variance for each data point
 #' @param n a vector of sample sizes
-#' @param invgamma a logical indicator of whether or not a inverse gamma prior for sigma is (T) or isn't included
-#' @param a0 initial a0
-#' @param b0 inital b0
+
 #'
 #' @return A list with the following elements: finalpostmean: a scalar of the final mean of the posterior, finalpostvar: the final posterior variance, finalpostsd: the final posterior standard deviation, dataweights: a vector of the weight of the data in the posterior, postmeans: a vector of the posterior means for each data point, postvar:  a vector of the posterior variance for each data point, postsds: a vector of the posterior standard deviations for each data point, posta: a vector of the posterior values of a if invgamma = T, and postb:  a vector of the posterior values of b in invgamma = T.
 #' @export
@@ -87,54 +113,46 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = F,
 #' set.seed(12)
 #' data1 = c(rnorm(10, mean = .48, sd = 0.05), rnorm(20, mean = .49, sd = 0.05),  rnorm(20, mean = .51, sd = 0.05))
 #' n = floor(runif(50, 200, 800))
-#' unigausscpiterative(data1, 0.5, 0.05, n = n) 
-#' unigausscpiterative(data1, 0.5, 0.05, n = n, invgamma = T, a0 = 0.0001, b0 = 0.0001)
-unigausscpiterative = function(data, priormean, priorvar, datavar = NULL, n, invgamma = F,  a0 = NULL, b0 = NULL){
+#' unigausscpiterative(data1, 0.5, 0.05, n = n)
+#' data2 = c(rnorm(50, mean = 0.5, 0.05))
+#' unigausscpiterative(data2)
+
+unigausscpiterative = function(data, priormean, priorvar, datavar = NULL, n){
+  #initialize the vector that stores the dataweight
   dataweights = rep(0, length(data))
+  #intialize the vector that stores the posterior mean
   postmeans = rep(0, length(data))
+  #initalize the vector that stores the posterior variance
   postvars = rep(0, length(data))
+  #initialize the vector that stores the posterior standard deviation
   postsds = rep(0, length(data))
+  #initalize the vectors for the parameters v, a,b, of a normal-gamma(mean, v, a, b) distribution 
   posta = rep(a0, length(data))
   postb = rep(b0, length(data))
+  postv = rep(0, length(data))
+  #calculates the variance of the poll if it is not provided
   if(is.null(datavar)){
     datavar = (data*(1-data))/n
   }
-  if(invgamma == F){
-    for(i in 1:length(data)){
-      out = unigausscp(data[i], priormean, priorvar, datavar = datavar[i], n[i])
-      postmeans[i] = out$postmean
-      postvars[i] = out$postvar
-      postsds[i] = out$postsd
-      dataweights[i] = out$dataweight
-      priormean = out$postmean
-      priorvar = out$postvar
-      
-    }
+  #iterates over the polls and uses the posterior as the prior in the next iteration
+  for(i in 1:length(data)){
+    #call function
+    out = unigausscp(data[i], priormean, priorvar, datavar = datavar[i], n[i])
+    #store posterior mean, variance, standard deviation, the data weight into their vectors
+    postmeans[i] = out$postmean
+    postvars[i] = out$postvar
+    postsds[i] = out$postsd
+    dataweights[i] = out$dataweight
+    #resets priormean and priorvar to be the posterior values of this loop
+    priormean = out$postmean
+    priorvar = out$postvar
     
   }
-  if(invgamma == T){
-    for(i in 1:length(data)){
-      out = unigausscp(data[i], priormean, priorvar, datavar = datavar[i], singlepoll = T, n = n[i], invgamma, a0, b0)
-      postmeans[i] = out$postmean
-      postvars[i] = out$postvar
-      postsds[i] = out$postsd
-      posta[i] = out$posta
-      postb[i] = out$postb
-      dataweights[i] = out$dataweight
-      priormean = out$postmean
-      priorvar = out$postvar
-      a0 = out$posta
-      b0 = out$postb
-      
-      
-      
-    }
 
-  }
-  finalpostmean = priormean
-  finalpostvar = priorvar
-  finalpostsd = sqrt(priorvar)
-  return(list(finalpostmean = finalpostmean,  finalpostvar = finalpostvar, finalpostsd = finalpostsd, dataweights = dataweights, postmeans = postmeans, postvars = postvars, postsds = postsds, posta = posta, postb = postb))
+  finalpostmean = out$postmean
+  finalpostvar = out$postvar
+  finalpostsd = sqrt(finalpostvar)
+  return(list(finalpostmean = finalpostmean,  finalpostvar = finalpostvar, finalpostsd = finalpostsd, dataweights = dataweights, postmeans = postmeans, postvars = postvars, postsds = postsds))
 }
 
 
