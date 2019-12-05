@@ -16,7 +16,7 @@
 #' 
 #' df2  = data.frame(a = c(0.3, .34, .38), b = c(0.2, 0.21, 0.25), c = c(.45, .42, .41))
 #' propnorm(df2)
-propnorm <- function(data){
+propnorm = function(data){
   if(!is.data.frame(data) && !is.matrix(data)){
     stop("data is not matrix or data frame")
   }
@@ -34,12 +34,12 @@ propnorm <- function(data){
 #' @export
 #'
 #' @examples
-#' #' df1 = data.frame(a = c(0.4, 0.3, .35, .45), b = c(.45, .40, .40, .3))
+#' df1 = data.frame(a = c(0.4, 0.3, .35, .45), b = c(.45, .40, .40, .3))
 #' propnormdf(df1)
 #' 
 #' df2  = data.frame(a = c(0.3, .34, .38), b = c(0.2, 0.21, 0.25), c = c(.45, .42, .41))
 #' propnormdf(df2)
-propnormdf <- function(df, columns){
+propnormdf = function(df, columns){
   data = df[columns]
   normdata = propnorm(data)
   colnames(normdata) = paste(colnames(data), "normalized")
@@ -47,6 +47,10 @@ propnormdf <- function(df, columns){
 }
 
 
-  
+propnormdfreplace = function(df, columns){
+  normdata = propnorm(df[, columns])
+  df[, columns] = normdata
+  return(df)
+}  
   
 
