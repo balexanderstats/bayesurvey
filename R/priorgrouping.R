@@ -49,13 +49,13 @@ getpriorassign = function(election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1,
 #' @param poll_data the data to fit the prior distribution , the first column must be the state name
 #' @param proploc the column the adjusted poll proportion is located
 #' @param stateloc the column the state is located in
-#' @param election_data 
-#' @param cutoffs 
-#' @param groupnames 
+#' @param election_data the election data in df form. The first column must contain the name of that state. 
+#' @param cutoffs the cutoffs used to split the data into the categories
+#' @param groupnames labels for the categories
 #' This function takes the poll data and adds the assigned prior region to the end of the data frame.  It also returns the mean of the prior distributions and the variance of the prior distributions, along with the vector appended to the data frame.
 #' @return
 #' @export
-#'
+#' This function returns a new data frame with a priorcat column to be accessed in other functions.
 #' @examples
 #' require(politicaldata)
 #' elect2008  = subset(pres_results , year == 2008)
