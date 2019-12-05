@@ -45,8 +45,11 @@ rmse = function(predicted, actual){
 #' @examples
 #' predict1 = data.frame(state = c("TX", "GA", "OR"), dem = c(.45, .49, .63), rep = c(.55, .51, .37))
 #' actual1 = data.frame(state = c("TX", "GA", "OR"), dem = c(.42, .48, .62), rep = c(.58, .52, .38))
-#' averageerror(predict1, actual1)
-averageerror = function(predicted, actual){
+#' average_error(predict1, actual1)
+#' predict2 = data.frame(state = c("OK", "MS", "WY"), dem = c(.42, .44, .3), rep = c(.56, .55, .7), other = c(0.02, 0.01, 0))
+#' actual2 = data.frame(state = c("OK", "MS", "WY"), dem = c(.41, .38, .3), rep = c(.55, .58, .69), other = c(0.04, 0.04, 0.01))
+#' average_error(predict2, actual2)
+average_error = function(predicted, actual){
   if(predicted[, 1] != actual[,1]){
     warning("Predicted names do not match names of actual data")
   }
