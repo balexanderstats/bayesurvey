@@ -3,7 +3,7 @@ This package implements Bayesian conjugate prior models with a focus on handling
 
 While it was designed for American election modelling it contains various functions useful for other applications. Many of these functions rely on each other and allow flexibility to adapt the method with a slightly different setup. A different prior can be specified and a inverse gamma prior can be added for the variance of the estimate.
 
-This package also includes polling data taken from [Huffington Post Pollster](https://elections.huffingtonpost.com/pollster).  There are data frames containing all polls for all states on the site for the 2008, 2012, and 2016 Presidential elections. National polls were not included to simplify the process of making state level prediction.  
+This package also includes polling data taken from [Huffington Post Pollster](https://elections.huffingtonpost.com/pollster).  There are data frames containing all polls for all states on the site for the 2016 Presidential elections. National polls were not included to simplify the process of making state level prediction.  
 
 This package is currently located on GitHub. It can be installed via the devtools package.
 
