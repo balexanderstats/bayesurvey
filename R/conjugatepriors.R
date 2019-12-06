@@ -73,6 +73,12 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = F,
   #adds a prior distribution and posterior of sigma
   
   if(invgamma == T){
+    if(is.null(a0) | is.null(b0)){
+      stop("a0 and b0 must be specified for inverse gamma model")
+    }
+    if(a0 < 0 | b0 < 0){
+      stop("a0 and b0 must be positive")
+    }
     #gets sum(x_i^2) where x_i is each respondent of the polls
     if(singlepoll == T){
       ssqdata = round(datamean * n, 0)
