@@ -2,7 +2,7 @@
 
 #' Root Mean Square Error
 #'
-#' This function calculates the root mean square error and checks that the idenifiers match. Note that if n=1, then the root mean square error is equivalent to the average error.
+#' This function calculates the root mean square error and checks that the idenifiers match. Note that if n=1, then the root mean square error is equivalent to the average error.  This function can only be used for proportions.
 #' @param predicted the predictions including the first column with a character vector with idenifiers to check that the rows of predicted and actual match 
 #' @param actual the real result including the first column with a character vector
 #'
@@ -31,7 +31,8 @@ rmse = function(predicted, actual){
     stop("Incompatiable dimensions of predicted and actual")
   }
   correction = ifelse(ncol(actual)>2, 2, 1)
-  return(sum((predicted[, -1] - actual[, -1])^2)/correction)
+  #this correction ensures that we are not counting an error twice.  If one column is overpredicted by 0.2, then the other columns must be underpredicted by two for proportions. 
+  return(sqrt(sum((predicted[, -1] - actual[, -1])^2)/(correction * nrow(predicted))))
 }
 
 #' Average Error by State
@@ -62,12 +63,14 @@ average_error = function(predicted, actual){
   if(nrow(predicted) != nrow(actual) | ncol(predicted) != ncol(actual)){
     stop("Incompatiable dimensions of predicted and actual")
   }
-  return(sum(predicted[, -1] - actual[, -1]))
+  correction = ifelse(ncol(actual)>2, 2, 1)
+  #this correction ensures that we are not counting an error twice.  If one column is overpredicted by 0.2, then the other columns must be underpredicted by two for proportions.
+  return(sum(abs(predicted[, -1] - actual[, -1]))/(correction * nrow(actual)))
 }
 
 #' Average Error by State
 #'
-#' This function calculates the root mean square error for each state over a single or multiple years and checks that the idenifiers match.
+#' This function calculates the root mean square error for each state over a single or multiple years and checks that the idenifiers match. This function can only be used for proportions.
 #' @param predicted the predictions including the first column with a character vector with idenifiers to check that the rows of predicted and actual match 
 #' @param actual the real result including the first column with a character vector
 #'
@@ -76,7 +79,7 @@ average_error = function(predicted, actual){
 #'
 #' @examples
 #' predict1 = data.frame(state = c("TX", "GA", "OR"), dem1 = c(.45, .49, .63), dem2 = c(.55, .51, .37))
-#' actual1 = data.frame(state = c("TX", "GA", "OR"), dem1 = c(.42, .48, .62), dem2 = c(.58, .52, .38))
+#' actual1 = data.frame(state = c("TX", "GA", "OR"), dem1 = c(.42, .48, .62), dem2 = c(.56, .49, .35))
 #' ae_by_state(predict1, actual1)
 #' predict2 = data.frame(state = c("OK", "MS", "WY"), dem1 = c(.42, .44, .3))
 #' actual2 = data.frame(state = c("OK", "MS", "WY"), dem1 = c(.41, .38, .3))
@@ -94,13 +97,13 @@ ae_by_state = function(predicted, actual){
   if(nrow(predicted) != nrow(actual) | ncol(predicted) != ncol(actual)){
     stop("Incompatiable dimensions of predicted and actual")
   }
-  ae = matrix(0, nrow = nrow(predict), ncol = (ncol(predict)-1))
+  ae = matrix(0, nrow = nrow(predicted), ncol = (ncol(predicted)-1))
   for(i in 1:nrow(predicted)){
-    for(j in 1:(ncol(predict) - 1)){
-      ae[i, j] = average_error(predicted[i,j ], actual[i, j])
+    for(j in 1:(ncol(predicted)-1)){
+      ae[i, j] = abs(predicted[i,j + 1] - actual[i, j + 1])
     }
     tae = rowMeans(ae)
   }
-  return(data.frame("state" = predicted[, 1]), "Average Error by predict" = ae, "Total Average Error"  = tae)
+  return(data.frame("state" = predicted[, 1], "Average Error by predict" = ae, "Total Average Error"  = tae))
   
 }
