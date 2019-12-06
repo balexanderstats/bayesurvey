@@ -41,7 +41,7 @@ n1 = floor(runif(1, 200, 800))
 datavar1 = mean(sqrt(data1[1]*(1-data1[1])/n1))
 unigausscp(data1, 0.5, 0.05)
 unigausscp(data1[1], 0.5, 0.05, singlepoll = T, n = n1)
-unigausscp(data1, 0.5, 1, invgamma = T, a0 = 0.0001, b0 = 0.0001)
+unigausscp(data1, 0.5, 1, invgamma = TRUE, a0 = 0.0001, b0 = 0.0001)
 
 
 }

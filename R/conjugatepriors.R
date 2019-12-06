@@ -1,6 +1,6 @@
 #conjugate prior functions
 
-#' Univariate Iterative Gaussian Conjugate Prior
+#' Univariate  Gaussian Conjugate Prior
 #' This function takes a vector of proportions and iteratives over it applying a gaussian conjugate prior calculation at each point, and using the posterior as the new prior in the next iteration.
 #' @param data a vector  of the data or a single point
 #' @param priormean mean of prior distribution
@@ -22,7 +22,7 @@
 #' datavar1 = mean(sqrt(data1[1]*(1-data1[1])/n1))
 #' unigausscp(data1, 0.5, 0.05)
 #' unigausscp(data1[1], 0.5, 0.05, singlepoll = T, n = n1)
-#' unigausscp(data1, 0.5, 1, invgamma = T, a0 = 0.0001, b0 = 0.0001)
+#' unigausscp(data1, 0.5, 1, invgamma = TRUE, a0 = 0.0001, b0 = 0.0001)
 #' 
 #' 
 unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = F,  n = NULL, invgamma = F, a0 = NULL, b0 = NULL){
