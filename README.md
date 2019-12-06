@@ -13,7 +13,7 @@ devtools::install_github("balexanderstats/bayesurvey")
 ```
 This package has the following functions:
 
-average_error:  This function finds the average error of predictions and works for any predictions even multivariate predictions.
+average_error:  This function finds the average error of predictions and works for any dataset of proportions even multivariate predictions.
 
 addcategorytopolls:  This function applies a cutoff based cluster assignment method like implemented in the paper and adds the assigned to the dataframe of poll data. This makes estimating prior parameters easier. The number of groups and the cutoffs are changable.
 
@@ -33,7 +33,7 @@ propnormdf: This function takes a dataframe and adds columns with the normalized
 
 propnormreplace:  This function replaces the data with the normalized version. This is not recommended for use by itself.
 
-rmse:  This function calculates the root mean square error of a prediction.  This function works on any data.
+rmse:  This function calculates the root mean square error of a prediction.  This function works on any proportional data.
 
 unigausscp:  This function is a univariate gaussian conjugate prior with or without an inverse gamma prior on the variance.  It works with any data.
 
