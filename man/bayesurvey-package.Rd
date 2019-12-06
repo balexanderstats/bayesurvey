@@ -3,29 +3,23 @@
 \alias{bayesurvey}
 \docType{package}
 \title{
-  A short title line describing what the package does
+  Bayesian Conjugate Prior Analysis of Survey Data
 }
 \description{
-  A more detailed description of what the package does. A length
-  of about one to five lines is recommended.
+This package implements Bayesian conjugate prior models with a focus on handling survey data with multiple categories. It starts by normalizing and transforming the data,  then fits prior distributions, and runs a conjugate prior analysis that can be iterative. While many of the functions are designed for categorical data, the conjugate prior functions work with any type of data..
 }
-\details{
-  This section should provide a more detailed overview of how to use the
-  package, including the most important functions.
-}
-\author{
-Your Name, email optional.
 
-Maintainer: Your Name <your@email.com>
+\author{
+Brittany Alexander
+
+Maintainer: Brittany Alexander <brittany@stat.tamu.edu>
 }
 \references{
-  This optional section can contain literature or other references for
-  background information.
+Poll-Based Bayesian Models to Predict United States Presidential Elections". B. Alexander, L. Ellingson, Joint Statistical Meetings Proceedings 2019.
+
 }
 \keyword{ package }
-\seealso{
-  Optional links to other man pages
-}
+
 \examples{
   \dontrun{
      ## Optional simple examples of the most important functions

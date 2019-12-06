@@ -1,4 +1,4 @@
-#' Prices of 50,000 round cut diamonds
+#' 2016 Pollster Polls
 #'
 #' A dataset containing state level poll data from Huffington's Post Pollster.  The data also contains new variables added 
 #'
