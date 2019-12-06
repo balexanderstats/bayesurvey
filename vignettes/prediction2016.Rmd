@@ -1,0 +1,219 @@
+---
+title: "Prediction of the 2016 Election"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Prediction of the 2016 Election}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(bayesurvey)
+```
+
+This vignette walks through how to implement and run both both the Iterative and Non-Iterative Models and also discusses potenials for modification. We will predict the 2016 election. Like in the article we will only make predictions for Hillary Clinton and Donald Trump, justifications for this decisions are explained in the article. Since this is a binary choice we only have to predict the vote for Clinton and then Trump's precited support will be 1-Clinton. There are two methodoogical changes in that produce slightly different results: the polls for the state being predictied are included in the prior mean and variance calculation, and the prior assignments are based on non-normalized election data.  This changes some results by about half a point.
+
+Presently the easiest way to get American election data for use in R is through the politicaldata package.  This is an imported package that should be installed with bayesurvey.
+
+First we need to get the election data.  We will follow as in the article and use the previous four elections.  Four was choosen so that could consider how a state responded to a variety of candidates and also provide some stability from year to year. The variable used to make the decision is the average margin across the previous four elections. The margin is defined as the difference between the democratic and republican candidate. Any one dimensional statistic of the election result could be used include: the democratic vote, the difference between the state's vote and the popular vote. However, the defult cutoffs are designed for the margin. Future research cross-valiadation  of the cutoffs and the number of election results to include is planned to pick the best parameters. 
+
+```{r}
+library(politicaldata)
+elect2000  = subset(pres_results , year == 2000)
+elect2000$margin = elect2000$dem - elect2000$rep
+elect2004 = subset(pres_results , year == 2004)
+elect2004$margin = elect2004$dem - elect2004$rep
+elect2008  = subset(pres_results , year == 2008)
+elect2008$margin = elect2008$dem - elect2008$rep
+elect2012 = subset(pres_results , year == 2012)
+elect2012$margin = elect2012$dem - elect2012$rep
+electdata = data.frame("state" = elect2008$state, "2000" = elect2000$margin, "2004" = elect2004$margin, "2008" =  elect2008$margin, "2012" = elect2012$margin)
+```
+
+Next we will look at the begining of the polls2016 data set to see the variables. We need to know the location of the columns with the proportions for Clinton and Trump, the location of the column that says what state the poll is from, the location of Clinton's numbers, and the locations of the number of observations. These locations are all inputs in the model.
+```{r looK_at_data}
+data(polls2016)
+head(polls2016)
+colnames(polls2016)
+```
+We see that Trump is located in column two, Clinton is located in column 3, the state is located in column 18, and the observation is located in column 12.
+
+The polling datasets in the package include some with missing values.  We need the polls to have a number of observations and proporitons for the two major candidates for the analysis to work.  We will now drop those polls from our data set. 
+```{r remove_nas}
+head(polls2016)
+polls = polls2016[ complete.cases(polls2016[, c(2, 3, 12)]), ]
+```
+
+
+
+Now that the election data is prepared, all that is needed to fit the model is simple calls to the function.
+First we fit the Iterative Gaussian model. The derivation of the model is in Alexander and Ellingson (2019). The output is also displayed for reference.
+
+```{r iterative_model}
+gaussianiterative = iterativegaussianmodelprop(polls, 18, c(2,3), 3, nloc = 12, election_data = electdata)
+gaussianiterative
+```
+
+Next we fit a noniterative model without inverse - gamma.The derivation of the model is in Alexander and Ellingson (2019).
+```{r gaussian_polls}
+gaussianpolls = noniterativegaussianmodelprop(polls, stateloc = 18, proploc = c(2,3), candidateloc =  3, nloc = 12, election_data = electdata)
+```
+
+Lastly, we fit a noniterative model with a non-informative normal-inverse-gamma prior NG(priormean, 1, 0.0001, 0.0001). This is notationally is a NG(priormean, V0, a0, b0).  This unlike the other models treats the variance as an unknown prior. A inverse gamma prior for an iterative model is not ideal without a transformation because it tends to produce a variance outside of the range of 0 to 1. The detailed derivation of this prior can be found [here](https://www.cs.ubc.ca/~murphyk/Papers/bayesGauss.pdf) on page 16.
+```{r gaussian_polls_ig}
+gaussianpolls_ig = noniterativegaussianmodelprop(polls, 18, c(2,3), 3, 12, election_data = electdata, invgamma = T, v0 = 1, a0 = 0.0001, b0 = 0.0001)
+```
+Now we calculate the error of the model.
+First we need to get the actual results.
+Then we need to normalize them so that we are only looking at the support for Clinton and Trump.
+```{r}
+elect2016 = subset(pres_results , year == 2016)
+#get normalized support
+dem2016 = propnorm(elect2016[, 4:5])[, 1]
+#store actual results
+actual2016 = data.frame("State" = elect2016$state, "Democratic Vote"  = dem2016)
+
+```
+
+
+We can see that the State columns for the actual data are different than the model. We will fix this by sorting the model results.
+```{r}
+identical(actual2016$State, gaussianiterative$State) #These are not the same
+gaussianiterative = gaussianiterative[order(gaussianiterative$State), ]# sort to be alphabetical
+identical(actual2016$State, gaussianiterative$State) # Now they are the same
+
+identical(actual2016$State, gaussianpolls$State) #These are not the same
+gaussianpolls = gaussianpolls[order(gaussianpolls$State), ]  # sort to be alphabetical
+identical(actual2016$State, gaussianpolls$State) # Now they are the same
+
+identical(actual2016$State, gaussianpolls_ig$State) #These are not the same
+gaussianpolls_ig = gaussianpolls_ig[order(gaussianpolls_ig$State), ]  # sort to be alphabetical
+identical(actual2016$State, gaussianpolls_ig$State) # Now they are the same
+
+```
+
+
+```{r}
+aeiterative = average_error(gaussianiterative[, 1:2], actual2016) 
+aepolls = average_error(gaussianpolls[, 1:2], actual2016)
+aepoll_ig = average_error(gaussianpolls_ig[, 1:2], actual2016)
+
+rmseiterative = rmse(gaussianiterative[, 1:2], actual2016) 
+rmsepolls = rmse(gaussianpolls[, 1:2], actual2016)
+rmsepoll_ig = rmse(gaussianpolls_ig[, 1:2], actual2016)
+
+```
+The iterative model had an average error of `r aeiterative`, and root mean square error of `r rmseiterative`. The Gaussian polls model had an average error of `r aepolls`, and root mean square error of `r rmsepolls`. The Gaussian polls model with a inverse gamma prior had an average error of `r aepoll_ig`, and root mean square error of `r rmsepoll_ig`.
+Now let's look at the state level.
+
+```{r}
+gaussianiterative_error = ae_by_state(gaussianiterative[, 1:2], actual2016)
+gaussianiterative_error
+gaussianpolls_error = ae_by_state(gaussianpolls[, 1:2], actual2016)
+gaussianpolls_error
+gaussianpolls_ig_error = ae_by_state(gaussianpolls_ig[, 1:2], actual2016)
+gaussianpolls_ig_error
+
+
+```
+
+
+
+
+
+Now let's find the prior assignments to see how that affected error. And add this to the data frames.
+```{r}
+priorassign = getpriorassign(electdata)
+priorassign
+priorassign = priorassign[order(priorassign[, 1]), ]
+gaussianiterative_error$priorgroup = priorassign[, 2]
+gaussianpolls_error$priorgroup = priorassign[, 2]
+gaussianpolls_ig_error$priorgroup = priorassign[, 2]
+```
+
+Now let's examine the distribution of the errors of the Iterative Gaussian model.
+```{r}
+library(ggplot2)
+ggplot(gaussianiterative_error, aes(Average.Error.by.predict
+))+ geom_histogram(binwidth = 0.02)
+```
+
+Now let's examine the distribution of the errors of the Gaussian Polls model.
+```{r}
+library(ggplot2)
+ggplot(gaussianpolls_error, aes(Average.Error.by.predict
+))+ geom_histogram(binwidth = 0.02)
+```
+
+Now let's examine the distribution of the errors of the Gaussian Polls with a inverse gamma prior model.
+```{r}
+library(ggplot2)
+ggplot(gaussianpolls_ig_error, aes(Average.Error.by.predict
+))+ geom_histogram(binwidth = 0.02)
+```
+
+As you can see these distributions are highly similar. Since polling errors are highly correlated across states, this example is not a sufficient sample size to conclude what model is better. 
+
+We can also break down this down by prior groups.
+
+Now let's examine the distribution of the errors of the Iterative Gaussian model.
+```{r}
+library(ggplot2)
+ggplot(gaussianiterative_error, aes(x = priorgroup , y = Average.Error.by.predict))+ geom_boxplot()
+```
+
+Now let's examine the distribution of the errors of the Gaussian Polls model.
+```{r}
+library(ggplot2)
+ggplot(gaussianpolls_error, aes(x = priorgroup , y = Average.Error.by.predict))+ geom_boxplot()
+```
+Now let's examine the distribution of the errors of the Gaussian Polls with inverse gamma model.
+```{r}
+library(ggplot2)
+ggplot(gaussianpolls_ig_error, aes(x = priorgroup , y = Average.Error.by.predict))+ geom_boxplot()
+```
+
+
+Let's now look more at what is happening at the state level. Let's get just the polls for Texas.
+```{r}
+texas_polls = subset(polls, State == "TX")
+```
+
+We know from above Texas is in the Red  (the second group) category. We can get the prior mean and variance by calling the addcategorytopolls function.
+```{r}
+out = addcategorytopolls(polls, 3, 18, electdata)
+priormeantx = mean(subset(out$new_poll_data, priorcat = "Red")$Dem2P)
+priorvartx = var(subset(out$new_poll_data, priorcat = "Red")$Dem2P)
+
+```
+
+We can now fit the models using the unigausscp and the unigausscpiterative. 
+
+
+For the Gaussian Polls model without a inverse gamma model,  use the unigausscp function and supply the prior mean and prior variance from the group.
+
+```{r}
+unigausscp(texas_polls$Dem2P, priormeantx, priorvartx)
+```
+This output gives the prior inputs of the analysis for use in other functions, and the posterior information.  The dataweight is helpful in showing the how much of the posterior is determined by the data instead of the prior.
+
+For the Gaussian Polls model with an inverse gamma model use the unigausscp function and supply the prior mean , and a prior variance of 1, because in this model the variance is a parameter. This is an noninformative prior on a0, b0, and the priorvariance and can be adjusted.
+
+```{r}
+unigausscp(texas_polls$Dem2P, priormeantx, 1, invgamma = T, a0 = 0.0001, b0 = 0.0001)
+```
+
+
+For the iterative model we supply both the priormean and prior variance, and normalized poll data. In the polls2016 file, normalized data for Clinton is in the Dem2P column.
+
+```{r}
+unigausscpiterative(texas_polls$Dem2P, priormeantx, priorvartx, n = texas_polls$observations)
+```
+
