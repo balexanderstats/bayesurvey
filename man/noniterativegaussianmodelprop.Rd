@@ -59,5 +59,5 @@ head(polls)
 nloc = which(colnames(polls2016) == "observations")
 stateloc  = which(colnames(polls) == "State")
 noniterativegaussianmodelprop(polls, stateloc, c(2,3),  3, nloc = nloc, election_data = electdata)
-noniterativegaussianmodelprop(polls, stateloc, c(2,3), 3, nloc = nloc, invgamma = T, v0 = 1, a0 = 0.0001, b0=0.0001)
+noniterativegaussianmodelprop(polls, stateloc, c(2,3), 3, nloc = nloc, invgamma = T, v0 = 1, a0 = 0.0001, b0=0.0001, election_data = electdata)
 }
