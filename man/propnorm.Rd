@@ -7,7 +7,7 @@
 propnorm(data)
 }
 \arguments{
-\item{data}{}
+\item{data}{the numeric data to be normailized}
 }
 \value{
 A data frame that is proportionally normalized

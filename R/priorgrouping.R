@@ -17,7 +17,7 @@
 #' elect2008$margin = elect2008$dem - elect2008$rep
 #' elect2012 = subset(pres_results , year == 2012)
 #' elect2012$margin = elect2012$dem - elect2012$rep
-#' data = data.frame(state = elect2008$state, 2008 =  elect2008$margin, 2012 = elect2012$margin)
+#' data = data.frame("state" = elect2008$state, "2008" =  elect2008$margin, "2012" = elect2012$margin)
 #' getpriorassign(data)
 #' weight = c(0.25,0.75)
 #' getpriorassign(data , weights = weight)
@@ -65,12 +65,14 @@ getpriorassign = function(election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1,
 #' elect2012$margin = elect2012$dem - elect2012$rep
 #' electdata = data.frame("state" = elect2008$state, "2008" =  elect2008$margin, "2012" = elect2012$margin)
 #' set.seed(16)
+#' data(polls2016)
 #' poll1 = polls2016[sample(1:nrow(polls2016), 500) ,]
 #' poll2 = polls2016[sample(1:nrow(polls2016), 500), ]
 #' propnormpolls1 = propnormdf(poll1, c(2,3))
 #' propnormpolls2 = propnormdf(poll2, c(2,3))
 #' addcategorytopolls(propnormpolls1, 30, 18, electdata)
-#' addcategorytopolls(propnormpolls2, 30, 18, electdata, cutoffs = c(-.15, -.1, -0.05, 0.05, .1, .15))
+#' newcutoff = c(-.15, -.1, -0.05, 0.05, .1, .15)
+#' addcategorytopolls(propnormpolls2, 30, 18, electdata, cutoffs = newcutoff)
 
 addcategorytopolls = function(poll_data, proploc, stateloc, election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1, .2), groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue", "Strong Blue")){
   assignment = getpriorassign(election_data, cutoffs, groupnames)

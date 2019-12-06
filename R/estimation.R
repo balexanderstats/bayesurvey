@@ -3,7 +3,7 @@
 #' MLE estimates of a Normal Distribution
 #' Fits a normal 
 #' @param data - a vector of data
-#'
+#' @param logit - if a logit transformation is needed
 #' @return a list with the elements: mean with the mean of the distribution and var with the variance of the distribution.
 #' @export
 #'
@@ -12,10 +12,13 @@
 #' data1  = rnorm(100)
 #' fitnormalvecMLE(data1)
 #' data2 = rnorm(100, mean  = .5, sd = 0.03)
-#' fitnormalvecMLE(data2, logit = T)
-fitnormalvecMLE <- function(data){
+#' fitnormalvecMLE(data2, logit = TRUE)
+fitnormalvecMLE <- function(data, logit = F){
   if(!is.vector(data)){
     stop("data must be a vector")
+  }
+  if(logit == T){
+    data = exp(data)/(exp(data)+1)
   }
   mean = mean(data)
   var = (length(data) - 1) * var(data)/length(data) # var uses n-1 so we must multiply by (n-1)/n to get MLE

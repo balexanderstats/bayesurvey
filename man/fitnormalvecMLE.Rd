@@ -5,10 +5,12 @@
 \title{MLE estimates of a Normal Distribution
 Fits a normal}
 \usage{
-fitnormalvecMLE(data)
+fitnormalvecMLE(data, logit = F)
 }
 \arguments{
 \item{data}{- a vector of data}
+
+\item{logit}{- if a logit transformation is needed}
 }
 \value{
 a list with the elements: mean with the mean of the distribution and var with the variance of the distribution.
@@ -22,5 +24,5 @@ set.seed(1)
 data1  = rnorm(100)
 fitnormalvecMLE(data1)
 data2 = rnorm(100, mean  = .5, sd = 0.03)
-fitnormalvecMLE(data2, logit = T)
+fitnormalvecMLE(data2, logit = TRUE)
 }

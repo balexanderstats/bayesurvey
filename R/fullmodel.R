@@ -104,7 +104,7 @@ iterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidateloc
 #' nloc = which(colnames(polls2016) == "observations")
 #' stateloc  = which(colnames(polls) == "State")
 #' noniterativegaussianmodelprop(polls, stateloc, c(2,3),  3, nloc = nloc, election_data = electdata)
-#' noniterativegaussianmodelprop(polls, stateloc, c(2,3), 3, nloc = nloc, invgamma = T, v0 = 1, a0 = 0.0001, b0=0.0001, election_data = electdata)
+#' noniterativegaussianmodelprop(polls, stateloc, c(2,3), 3, nloc = nloc, invgamma = TRUE, v0 = 1, a0 = 0.0001, b0=0.0001, election_data = electdata)
 noniterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidateloc,  varloc = NULL, nloc, invgamma = F, v0 = NULL,  a0 = NULL, b0 = NULL, election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1, .2), groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue", "Strong Blue")){
   #step 1 get prior assignments
   

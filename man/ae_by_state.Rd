@@ -15,11 +15,11 @@ ae_by_state(predicted, actual)
 a data frame with the state and the average error for that state
 }
 \description{
-This function calculates the root mean square error for each state over a single or multiple years and checks that the idenifiers match.
+This function calculates the root mean square error for each state over a single or multiple years and checks that the idenifiers match. This function can only be used for proportions.
 }
 \examples{
 predict1 = data.frame(state = c("TX", "GA", "OR"), dem1 = c(.45, .49, .63), dem2 = c(.55, .51, .37))
-actual1 = data.frame(state = c("TX", "GA", "OR"), dem1 = c(.42, .48, .62), dem2 = c(.58, .52, .38))
+actual1 = data.frame(state = c("TX", "GA", "OR"), dem1 = c(.42, .48, .62), dem2 = c(.56, .49, .35))
 ae_by_state(predict1, actual1)
 predict2 = data.frame(state = c("OK", "MS", "WY"), dem1 = c(.42, .44, .3))
 actual2 = data.frame(state = c("OK", "MS", "WY"), dem1 = c(.41, .38, .3))

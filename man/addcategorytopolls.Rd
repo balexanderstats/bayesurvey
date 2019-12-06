@@ -38,10 +38,12 @@ elect2012 = subset(pres_results , year == 2012)
 elect2012$margin = elect2012$dem - elect2012$rep
 electdata = data.frame("state" = elect2008$state, "2008" =  elect2008$margin, "2012" = elect2012$margin)
 set.seed(16)
+data(polls2016)
 poll1 = polls2016[sample(1:nrow(polls2016), 500) ,]
 poll2 = polls2016[sample(1:nrow(polls2016), 500), ]
 propnormpolls1 = propnormdf(poll1, c(2,3))
 propnormpolls2 = propnormdf(poll2, c(2,3))
 addcategorytopolls(propnormpolls1, 30, 18, electdata)
-addcategorytopolls(propnormpolls2, 30, 18, electdata, cutoffs = c(-.15, -.1, -0.05, 0.05, .1, .15))
+newcutoff = c(-.15, -.1, -0.05, 0.05, .1, .15)
+addcategorytopolls(propnormpolls2, 30, 18, electdata, cutoffs = newcutoff)
 }

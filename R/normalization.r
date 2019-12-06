@@ -5,7 +5,7 @@
 #' Proportional Normalization of data frame
 #' 
 #' Takes a data frame and normalizes it such that the rowSum is one
-#' @param data 
+#' @param data the numeric data to be normailized
 #'
 #' @return A data frame that is proportionally normalized
 #' @export
