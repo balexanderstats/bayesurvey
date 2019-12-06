@@ -104,7 +104,7 @@ iterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidateloc
 #' nloc = which(colnames(polls2016) == "observations")
 #' stateloc  = which(colnames(polls) == "State")
 #' noniterativegaussianmodelprop(polls, stateloc, c(2,3),  3, nloc = nloc, election_data = electdata)
-#' noniterativegaussianmodelprop(polls, stateloc, c(2,3), 3, nloc = nloc, invgamma = T, v0 = 1, a0 = 0.0001, b0=0.0001)
+#' noniterativegaussianmodelprop(polls, stateloc, c(2,3), 3, nloc = nloc, invgamma = T, v0 = 1, a0 = 0.0001, b0=0.0001, election_data = electdata)
 noniterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidateloc,  varloc = NULL, nloc, invgamma = F, v0 = NULL,  a0 = NULL, b0 = NULL, election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1, .2), groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue", "Strong Blue")){
   #step 1 get prior assignments
   
@@ -121,7 +121,12 @@ noniterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidate
   #gets the prior mean from the add categories output
   priormeans = priorout$priormean
   #sets prior variance to v0 for inverse gamma model and to the add category output for other functions
-  priorvars = ifelse(invgamma == T, rep(v0, length(groupnames)), priorout$priorvar)
+  if(invgamma == T){
+    priorvars = rep(v0, length(groupnames))
+  }
+  if(invgamma == F){
+    priorvars = priorout$priorvar
+  }
   
   #initialize posterior mean and variance
   postmeans = rep(NA, statenum)
@@ -137,11 +142,13 @@ noniterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidate
     #calls prior mean and variance for that group
     priormeantemp = priormeans[groupnameloc]
     priorvartemp = priorvars[groupnameloc]
+    if(priormeantemp == 0 | is.na(priormeantemp)){
+      print(i)
+    }
     #runs model
-    postout = unigausscp(poll_temp[, candidateloc], priormeantemp, priorvartemp, datavar = NULL, poll_temp[, nloc], invgamma, v0, a0, b0)
-    #saves posterior
-    postmeans[i] = postout$finalpostmean
-    postvars[i] = postout$finalpostvar
+    postout = unigausscp(poll_temp[, candidateloc], priormeantemp, priorvartemp, invgamma = invgamma, a0 = a0, b0 = b0)
+    postmeans[i] = postout$postmean
+    postvars[i] = postout$postvar
   }
   postsd = sqrt(postvars)
   return(data.frame("State" = statenames, "Posterior Mean" = postmeans, "Posterior Variance" = postvars, "Posterior Standard Deviation" = postsd))
