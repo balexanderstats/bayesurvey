@@ -55,7 +55,7 @@ elect2012 = subset(pres_results , year == 2012)
 elect2012$margin = elect2012$dem - elect2012$rep
 electdata = data.frame("state" = elect2008$state, "2008" =  elect2008$margin, "2012" = elect2012$margin)
 data(polls2016)
-polls = polls2016[, complete.cases(polls2016[, c(2, 3, 12)])]
+polls = polls2016[complete.cases(polls2016[, c(2, 3, 12)]), ]
 head(polls)
 nloc = which(colnames(polls2016) == "observations")
 stateloc  = which(colnames(polls) == "State")
