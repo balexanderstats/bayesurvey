@@ -33,8 +33,8 @@ elect2008  = subset(pres_results , year == 2008)
 elect2008$margin = elect2008$dem - elect2008$rep
 elect2012 = subset(pres_results , year == 2012)
 elect2012$margin = elect2012$dem - elect2012$rep
-data = data.frame("state" = elect2008$state, "2008" =  elect2008$margin, "2012" = elect2012$margin)
-getpriorassign(data)
+data1 = data.frame("state" = elect2008$state, "2008" =  elect2008$margin, "2012" = elect2012$margin)
+getpriorassign(data1)
 weight = c(0.25,0.75)
-getpriorassign(data , weights = weight)
+getpriorassign(data1 , weights = weight)
 }
