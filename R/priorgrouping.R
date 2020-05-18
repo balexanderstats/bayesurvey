@@ -89,5 +89,55 @@ addcategorytopolls = function(poll_data, proploc, stateloc, election_data, cutof
   }
   newdf = cbind(poll_data, priorcat)
   return(list(new_poll_data = newdf, priorcat = priorcat, priormean = priormean, priorvar = priorvar))  
+}
+
+
+
+
+#' Title
+#'
+#' @param poll_data 
+#' @param marginloc 
+#' @param stateloc 
+#' @param election_data 
+#' @param cutoffs 
+#' @param groupnames 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' require(politicaldata)
+#' elect2008  = subset(pres_results , year == 2008)
+#' elect2008$margin = elect2008$dem - elect2008$rep
+#' elect2012 = subset(pres_results , year == 2012)
+#' elect2012$margin = elect2012$dem - elect2012$rep
+#' electdata = data.frame("state" = elect2008$state, "2008" =  elect2008$margin, "2012" = elect2012$margin)
+#' set.seed(16)
+#' data(polls2016)
+#' poll1 = polls2016[sample(1:nrow(polls2016), 500) ,]
+#' poll2 = polls2016[sample(1:nrow(polls2016), 500), ]
+#' propnormpolls1 = propnormdf(poll1, c(2,3))
+#' propnormpolls2 = propnormdf(poll2, c(2,3))
+#' poll2016$margin = poll2016$Trump - polls2016$Clinton
+#' marginloc = which(colnames(polls2016) == "margin")
+#' stateloc = which(colnames(polls2016) == "State")
+#' addcategorytopollsmargin(polls2016, marginloc = marginloc, stateloc = stateloc, election_data = electdata)
+addcategorytopollsmargin = function(poll_data, marginloc, stateloc, election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1, .2), groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue", "Strong Blue")){
+  assignment = getpriorassign(election_data, cutoffs, groupnames)
+  categories  = length(groupnames)
+  priormean = rep(NA, categories)
+  priorvar = rep(NA, categories)
+  priorcat = rep("", nrow(poll_data))
+  for(i in 1:categories){
+    statenames = assignment[which(assignment[ , 2] == groupnames[i]) , 1]
+    priorcat[which(poll_data[, stateloc] %in% statenames)] = groupnames[i]
+    polls_temp = poll_data[priorcat == groupnames[i], ]
+    priormean[i] = mean(polls_temp[ ,marginloc])
+    priorvar[i] = var(polls_temp[, marginloc])
   }
+  newdf = cbind(poll_data, priorcat)
+  return(list(new_poll_data = newdf, priorcat = priorcat, priormean = priormean, priorvar = priorvar)) 
+  
+}
   
