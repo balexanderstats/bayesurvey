@@ -129,6 +129,7 @@ addcategorytopollsmargin = function(poll_data, marginloc, stateloc, election_dat
   priormean = rep(NA, categories)
   priorvar = rep(NA, categories)
   priorcat = rep("", nrow(poll_data))
+
   for(i in 1:categories){
     statenames = assignment[which(assignment[ , 2] == groupnames[i]) , 1]
     priorcat[which(poll_data[, stateloc] %in% statenames)] = groupnames[i]
