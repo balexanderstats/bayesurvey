@@ -5,10 +5,15 @@
 \title{Adds Category assignment to Poll Data 
 This function returns a new data frame with a priorcat column to be accessed in other functions.}
 \usage{
-addcategorytopolls(poll_data, proploc, stateloc, election_data,
+addcategorytopolls(
+  poll_data,
+  proploc,
+  stateloc,
+  election_data,
   cutoffs = c(-0.2, -0.1, -0.025, 0.025, 0.1, 0.2),
-  groupnames = c("Strong Red", "Red", "Lean Red", "Competitive",
-  "Lean Blue", "Blue", "Strong Blue"))
+  groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue",
+    "Strong Blue")
+)
 }
 \arguments{
 \item{poll_data}{the data to fit the prior distribution , the first column must be the state name}

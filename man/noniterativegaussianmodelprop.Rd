@@ -6,11 +6,22 @@
 This function completely fits the Iterative Gaussian Proportional model in Alexander and Ellingson (2019) given raw poll data, election data, and basic parameters.
 Given polling data on congressional districts or senate seats this could make similar predictions.}
 \usage{
-noniterativegaussianmodelprop(poll_data, stateloc, proploc, candidateloc,
-  varloc = NULL, nloc, invgamma = F, v0 = NULL, a0 = NULL,
-  b0 = NULL, election_data, cutoffs = c(-0.2, -0.1, -0.025, 0.025, 0.1,
-  0.2), groupnames = c("Strong Red", "Red", "Lean Red", "Competitive",
-  "Lean Blue", "Blue", "Strong Blue"))
+noniterativegaussianmodelprop(
+  poll_data,
+  stateloc,
+  proploc,
+  candidateloc,
+  varloc = NULL,
+  nloc,
+  invgamma = F,
+  v0 = NULL,
+  a0 = NULL,
+  b0 = NULL,
+  election_data,
+  cutoffs = c(-0.2, -0.1, -0.025, 0.025, 0.1, 0.2),
+  groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue",
+    "Strong Blue")
+)
 }
 \arguments{
 \item{poll_data}{a data frame containing all necessary datat}

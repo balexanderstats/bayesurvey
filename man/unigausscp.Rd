@@ -5,9 +5,17 @@
 \title{Univariate  Gaussian Conjugate Prior
 This function takes a vector of proportions and iteratives over it applying a gaussian conjugate prior calculation at each point, and using the posterior as the new prior in the next iteration.}
 \usage{
-unigausscp(data, priormean, priorvar, datavar = NULL,
-  singlepoll = FALSE, n = NULL, invgamma = F, a0 = NULL,
-  b0 = NULL)
+unigausscp(
+  data,
+  priormean,
+  priorvar,
+  datavar = NULL,
+  singlepoll = FALSE,
+  n = NULL,
+  invgamma = F,
+  a0 = NULL,
+  b0 = NULL
+)
 }
 \arguments{
 \item{data}{a vector  of the data or a single point}

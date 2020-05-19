@@ -4,7 +4,9 @@
 \name{polls2016}
 \alias{polls2016}
 \title{2016 Pollster Polls}
-\format{A data frame with 2650 rows and 28 variables}
+\format{
+A data frame with 2650 rows and 28 variables
+}
 \usage{
 data(polls2016)
 }

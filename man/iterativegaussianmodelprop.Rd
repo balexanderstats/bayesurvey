@@ -4,10 +4,18 @@
 \alias{iterativegaussianmodelprop}
 \title{Iterative Gaussian Conjugate Prior Model for American Election}
 \usage{
-iterativegaussianmodelprop(poll_data, stateloc, proploc, candidateloc,
-  varloc = NULL, nloc, election_data, cutoffs = c(-0.2, -0.1, -0.025,
-  0.025, 0.1, 0.2), groupnames = c("Strong Red", "Red", "Lean Red",
-  "Competitive", "Lean Blue", "Blue", "Strong Blue"))
+iterativegaussianmodelprop(
+  poll_data,
+  stateloc,
+  proploc,
+  candidateloc,
+  varloc = NULL,
+  nloc,
+  election_data,
+  cutoffs = c(-0.2, -0.1, -0.025, 0.025, 0.1, 0.2),
+  groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue",
+    "Strong Blue")
+)
 }
 \arguments{
 \item{poll_data}{a data frame containing all necessary datat}
