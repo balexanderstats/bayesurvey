@@ -119,7 +119,7 @@ addcategorytopolls = function(poll_data, proploc, stateloc, election_data, cutof
 #' poll2 = polls2016[sample(1:nrow(polls2016), 500), ]
 #' propnormpolls1 = propnormdf(poll1, c(2,3))
 #' propnormpolls2 = propnormdf(poll2, c(2,3))
-#' poll2016$margin = poll2016$Trump - polls2016$Clinton
+#' polls2016$margin = polls2016$Trump - polls2016$Clinton
 #' marginloc = which(colnames(polls2016) == "margin")
 #' stateloc = which(colnames(polls2016) == "State")
 #' addcategorytopollsmargin(polls2016, marginloc = marginloc, stateloc = stateloc, election_data = electdata)

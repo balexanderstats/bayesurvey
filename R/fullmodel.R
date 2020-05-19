@@ -155,3 +155,317 @@ noniterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidate
   postsd = sqrt(postvars)
   return(data.frame("State" = statenames, "Posterior Mean" = postmeans, "Posterior Variance" = postvars, "Posterior Standard Deviation" = postsd))
 }
+
+
+
+
+#' Gaussian Rolling Average
+#' @param poll_data 
+#' @param stateloc 
+#' @param proploc 
+#' @param candidateloc 
+#' @param npolls 
+#' @param varloc 
+#' @param nloc 
+#' @param invgamma 
+#' @param v0 
+#' @param a0 
+#' @param b0 
+#' @param election_data 
+#' @param cutoffs 
+#' @param groupnames 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' require(politicaldata)
+#' elect2008  = subset(pres_results , year == 2008)
+#' elect2008$margin = elect2008$dem - elect2008$rep
+#' elect2012 = subset(pres_results , year == 2012)
+#' elect2012$margin = elect2012$dem - elect2012$rep
+#' electdata = data.frame("state" = elect2008$state, "2008" =  elect2008$margin, "2012" = elect2012$margin)
+#' data(polls2016)
+#' polls = polls2016[ complete.cases(polls2016[, c(2, 3, 12)]), ]
+#' head(polls)
+#' nloc = which(colnames(polls2016) == "observations")
+#' stateloc  = which(colnames(polls) == "State")
+#' gaussianrollingaverage(polls, stateloc = stateloc, proploc = c(2,3), 3, nloc = nloc, election_data = electdata)
+gaussianrollingaverage = function(poll_data, stateloc, proploc, candidateloc, npolls = 10,  varloc = NULL, nloc, invgamma = F, v0 = NULL,  a0 = NULL, b0 = NULL, election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1, .2), groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue", "Strong Blue")){
+  
+  #normalizes the polling data
+  newdf = propnormdfreplace(poll_data, proploc)
+  #gets the list of state names
+  statenames = unique(poll_data[ , stateloc])
+  statenum = length(statenames)
+  #calls function to add the prior category to polls
+  priorout = addcategorytopolls(newdf, candidateloc,  stateloc, election_data, cutoffs, groupnames)
+  
+  #saves data frame with the categories
+  finaldf = priorout$new_poll_data
+  #gets the prior mean from the add categories output
+  priormeans = priorout$priormean
+  #sets prior variance to v0 for inverse gamma model and to the add category output for other functions
+  if(invgamma == T){
+    priorvars = rep(v0, length(groupnames))
+  }
+  if(invgamma == F){
+    priorvars = priorout$priorvar
+  }
+  
+  #initialize posterior mean and variance
+  postmeans = rep(NA, statenum)
+  postvars = rep(NA, statenum)
+  
+  for(i in 1:statenum){
+    #subset the data to get only polls of one state
+    poll_temp = subset(finaldf, finaldf[, stateloc] == statenames[i])
+    if(nrow(poll_temp) > npolls){
+      poll_temp = poll_temp[order(poll_temp$end_date),]
+      poll_temp = poll_temp[1:npolls,]
+    }
+    #gets the groupname for the state
+    groupnametemp = poll_temp$priorcat[1]
+    #finds the location of the group name
+    groupnameloc = which(groupnames == groupnametemp, arr.ind = T)
+    #calls prior mean and variance for that group
+    priormeantemp = priormeans[groupnameloc]
+    priorvartemp = priorvars[groupnameloc]
+    if(priormeantemp == 0 | is.na(priormeantemp)){
+      print(i)
+    }
+    #runs model
+    postout = unigausscp(poll_temp[, candidateloc], priormeantemp, priorvartemp, invgamma = invgamma, a0 = a0, b0 = b0)
+    postmeans[i] = postout$postmean
+    postvars[i] = postout$postvar
+  }
+  postsd = sqrt(postvars)
+  return(data.frame("State" = statenames, "Posterior Mean" = postmeans, "Posterior Variance" = postvars, "Posterior Standard Deviation" = postsd))
+}
+
+
+#' Rolling Average Iterative Gaussian Bayesian Model
+#'
+#' @param poll_data 
+#' @param stateloc 
+#' @param proploc 
+#' @param candidateloc 
+#' @param npolls 
+#' @param varloc 
+#' @param nloc 
+#' @param invgamma 
+#' @param v0 
+#' @param a0 
+#' @param b0 
+#' @param election_data 
+#' @param cutoffs 
+#' @param groupnames 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' require(politicaldata)
+#' elect2008  = subset(pres_results , year == 2008)
+#' elect2008$margin = elect2008$dem - elect2008$rep
+#' elect2012 = subset(pres_results , year == 2012)
+#' elect2012$margin = elect2012$dem - elect2012$rep
+#' electdata = data.frame("state" = elect2008$state, "2008" =  elect2008$margin, "2012" = elect2012$margin)
+#' data(polls2016)
+#' polls = polls2016[ complete.cases(polls2016[, c(2, 3, 12)]), ]
+#' head(polls)
+#' nloc = which(colnames(polls2016) == "observations")
+#' stateloc  = which(colnames(polls) == "State")
+#' gaussianrollingaverage(polls, stateloc = stateloc, proploc = c(2,3), 3, nloc = nloc, election_data = electdata)
+gaussianrollingaverageiterative = function(poll_data, stateloc, proploc, candidateloc, npolls = 10,  varloc = NULL, nloc, invgamma = F, v0 = NULL,  a0 = NULL, b0 = NULL, election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1, .2), groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue", "Strong Blue")){
+  
+  #normalizes the polling data
+  newdf = propnormdfreplace(poll_data, proploc)
+  #gets the list of state names
+  statenames = unique(poll_data[ , stateloc])
+  statenum = length(statenames)
+  #calls function to add the prior category to polls
+  priorout = addcategorytopolls(newdf, candidateloc,  stateloc, election_data, cutoffs, groupnames)
+  
+  #saves data frame with the categories
+  finaldf = priorout$new_poll_data
+  #gets the prior mean from the add categories output
+  priormeans = priorout$priormean
+  #sets prior variance to v0 for inverse gamma model and to the add category output for other functions
+  if(invgamma == T){
+    priorvars = rep(v0, length(groupnames))
+  }
+  if(invgamma == F){
+    priorvars = priorout$priorvar
+  }
+  
+  #initialize posterior mean and variance
+  postmeans = rep(NA, statenum)
+  postvars = rep(NA, statenum)
+  
+  for(i in 1:statenum){
+    #subset the data to get only polls of one state
+    poll_temp = subset(finaldf, finaldf[, stateloc] == statenames[i])
+    if(nrow(poll_temp) > npolls){
+      poll_temp = poll_temp[order(poll_temp$end_date), ]
+      poll_temp = poll_temp[1:npolls, ]
+    }
+    #gets the groupname for the state
+    groupnametemp = poll_temp$priorcat[1]
+    #finds the location of the group name
+    groupnameloc = which(groupnames == groupnametemp, arr.ind = T)
+    #calls prior mean and variance for that group
+    priormeantemp = priormeans[groupnameloc]
+    priorvartemp = priorvars[groupnameloc]
+    if(priormeantemp == 0 | is.na(priormeantemp)){
+      print(i)
+    }
+    #runs model
+    postout = unigausscpiterative(poll_temp[, candidateloc], priormeantemp, priorvartemp, n = nloc)
+    postmeans[i] = postout$finalpostmean
+    postvars[i] = postout$finalpostvar
+  }
+  postsd = sqrt(postvars)
+  return(data.frame("State" = statenames, "Posterior Mean" = postmeans, "Posterior Variance" = postvars, "Posterior Standard Deviation" = postsd))
+}
+
+
+
+
+#' Title
+#'
+#' @param poll_data 
+#' @param stateloc 
+#' @param proploc 
+#' @param candidateloc 
+#' @param npolls 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' require(politicaldata)
+#' elect2008  = subset(pres_results , year == 2008)
+#' elect2008$margin = elect2008$dem - elect2008$rep
+#' elect2012 = subset(pres_results , year == 2012)
+#' elect2012$margin = elect2012$dem - elect2012$rep
+#' electdata = data.frame("state" = elect2008$state, "2008" =  elect2008$margin, "2012" = elect2012$margin)
+#' data(polls2016)
+#' polls = polls2016[ complete.cases(polls2016[, c(2, 3, 12)]), ]
+#' stateloc  = which(colnames(polls) == "State")
+#' pollrollingaverage(polls, stateloc = stateloc, proploc = c(2,3), 3)
+pollrollingaverage=function(poll_data, stateloc, proploc, candidateloc, npolls = 10){
+  #normalizes the polling data
+  newdf = propnormdfreplace(poll_data, proploc)
+  #gets the list of state names
+  statenames = unique(poll_data[ , stateloc])
+  statenum = length(statenames)
+  #calls function to add the prior category to polls
+  
+  
+  #initialize posterior mean and variance
+  statemeans = rep(NA, statenum)
+  statevars = rep(NA, statenum)
+  
+  for(i in 1:statenum){
+    #subset the data to get only polls of one state
+    poll_temp = subset(newdf, newdf[, stateloc] == statenames[i])
+    if(nrow(poll_temp) > npolls){
+      poll_temp = poll_temp[order(poll_temp$end_date),]
+      poll_temp = poll_temp[1:npolls,]
+      statemeans[i] = mean(poll_temp[, candidateloc])
+      statevars[i] = var(poll_temp[, candidateloc])
+    }
+    postsd = sqrt(postvars)
+    return(data.frame("State" = statenames, "Predicted Mean" = statemeans, "Predicted Variance" = statevars, "Predicted Standard Deviation" = sqrt(statevars)))
+  }
+}
+
+
+
+
+#margin based models
+#prior function is the same
+#have input for normalize vs not normalize
+# no iterative model
+# rolling average
+
+
+#' Title
+#'
+#' @param poll_data 
+#' @param stateloc 
+#' @param marginloc 
+#' @param invgamma 
+#' @param v0 
+#' @param a0 
+#' @param b0 
+#' @param election_data 
+#' @param cutoffs 
+#' @param groupnames 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' require(politicaldata)
+#' elect2008  = subset(pres_results , year == 2008)
+#' elect2008$margin = elect2008$dem - elect2008$rep
+#' elect2012 = subset(pres_results , year == 2012)
+#' elect2012$margin = elect2012$dem - elect2012$rep
+#' electdata = data.frame("state" = elect2008$state, "2008" =  elect2008$margin, "2012" = elect2012$margin)
+#' data(polls2016)
+#' polls = polls2016[ complete.cases(polls2016[, c(2, 3, 12)]), ]
+#' stateloc  = which(colnames(polls) == "State")
+#' polls2016$margin = polls2016$Trump - polls2016$Clinton
+#' marginloc = which(colnames(polls2016) == "margin")
+#' margingaussianmodelprop(polls2016, stateloc = stateloc, marginloc = marginloc)
+margingaussianmodelprop = function(poll_data, stateloc, marginloc,  npolls = NULL, invgamma = F, v0 = NULL,  a0 = NULL, b0 = NULL, election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1, .2), groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue", "Strong Blue")){
+  #step 1 get prior assignments
+  
+  #normalizes the polling data
+  newdf = propnormdfreplace(poll_data, proploc)
+  #gets the list of state names
+  statenames = unique(poll_data[ , stateloc])
+  statenum = length(statenames)
+  #calls function to add the prior category to polls
+  priorout = addcategorytopollsmargin(newdf, marginloc,  stateloc, election_data, cutoffs, groupnames)
+  
+  #saves data frame with the categories
+  finaldf = priorout$new_poll_data
+  #gets the prior mean from the add categories output
+  priormeans = priorout$priormean
+  #sets prior variance to v0 for inverse gamma model and to the add category output for other functions
+  if(invgamma == T){
+    priorvars = rep(v0, length(groupnames))
+  }
+  if(invgamma == F){
+    priorvars = priorout$priorvar
+  }
+  
+  #initialize posterior mean and variance
+  postmeans = rep(NA, statenum)
+  postvars = rep(NA, statenum)
+  
+  
+  for(i in 1:statenum){
+    #subset the data to get only polls of one state
+    poll_temp = subset(finaldf, finaldf[, stateloc] == statenames[i])
+    #gets the groupname for the state
+    groupnametemp = poll_temp$priorcat[1]
+    #finds the location of the group name
+    groupnameloc = which(groupnames == groupnametemp, arr.ind = T)
+    #calls prior mean and variance for that group
+    priormeantemp = priormeans[groupnameloc]
+    priorvartemp = priorvars[groupnameloc]
+    if(priormeantemp == 0 | is.na(priormeantemp)){
+      print(i)
+    }
+    #runs model
+    postout = unigausscp(poll_temp[, marginloc], priormeantemp, priorvartemp, invgamma = invgamma, a0 = a0, b0 = b0)
+    postmeans[i] = postout$postmean
+    postvars[i] = postout$postvar
+  }
+  postsd = sqrt(postvars)
+  return(data.frame("State" = statenames, "Posterior Mean" = postmeans, "Posterior Variance" = postvars, "Posterior Standard Deviation" = postsd))
+}
