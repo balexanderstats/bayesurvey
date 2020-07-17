@@ -141,12 +141,14 @@ unigausscpiterative = function(data, priormean, priorvar, datavar = NULL, n){
     datavar = (data*(1-data))/n
   }
   
-  if(sum(data > 1) > 1 | sum(data < 0) > 1){
+  if(sum(data > 1) > 0 | sum(data < 0) > 0){
     stop("The data contains numbers outside of 0 and 1.")
   }
   #iterates over the polls and uses the posterior as the prior in the next iteration
   for(i in 1:length(data)){
     #call function
+    if(is.na(datavar[i])){
+      datavar[i] = (data[i]*(1-data[i]))/n[i]}
     out = unigausscp(data[i], priormean, priorvar, datavar = datavar[i], n[i])
     #store posterior mean, variance, standard deviation, the data weight into their vectors
     postmeans[i] = out$postmean
