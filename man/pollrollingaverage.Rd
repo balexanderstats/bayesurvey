@@ -23,3 +23,15 @@ pollrollingaverage(poll_data, stateloc, proploc, candidateloc, npolls = 10)
 \description{
 Title
 }
+\examples{
+require(politicaldata)
+elect2008  = subset(pres_results , year == 2008)
+elect2008$margin = elect2008$dem - elect2008$rep
+elect2012 = subset(pres_results , year == 2012)
+elect2012$margin = elect2012$dem - elect2012$rep
+electdata = data.frame("state" = elect2008$state, "2008" =  elect2008$margin, "2012" = elect2012$margin)
+data(polls2016)
+polls = polls2016[ complete.cases(polls2016[, c(2, 3, 12)]), ]
+stateloc  = which(colnames(polls) == "State")
+pollrollingaverage(polls, stateloc = stateloc, proploc = c(2,3), 3)
+}

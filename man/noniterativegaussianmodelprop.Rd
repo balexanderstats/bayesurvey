@@ -13,6 +13,8 @@ noniterativegaussianmodelprop(
   candidateloc,
   varloc = NULL,
   nloc,
+  npolls = NULL,
+  dateloc = NULL,
   invgamma = F,
   v0 = NULL,
   a0 = NULL,
@@ -35,6 +37,10 @@ noniterativegaussianmodelprop(
 \item{varloc}{the location of the variance if it is provided}
 
 \item{nloc}{the location of the sample sizes}
+
+\item{npolls}{the number of polls to include, default is all polls}
+
+\item{dateloc}{the location of the date used to determine the last npolls}
 
 \item{invgamma}{an indicator if an inverse gamma model is fit}
 
@@ -70,6 +76,8 @@ polls = polls2016[complete.cases(polls2016[, c(2, 3, 12)]), ]
 head(polls)
 nloc = which(colnames(polls2016) == "observations")
 stateloc  = which(colnames(polls) == "State")
+dateloc =  which(colnames(polls) == end_date)
 noniterativegaussianmodelprop(polls, stateloc, c(2,3),  3, nloc = nloc, election_data = electdata)
+noniterativegaussianmodelprop(polls, stateloc, c(2,3),  3, dateloc = 9, nloc = nloc, election_data = electdata, npolls = 10)
 noniterativegaussianmodelprop(polls, stateloc, c(2,3), 3, nloc = nloc, invgamma = TRUE, v0 = 1, a0 = 0.0001, b0=0.0001, election_data = electdata)
 }

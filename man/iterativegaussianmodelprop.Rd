@@ -11,6 +11,8 @@ iterativegaussianmodelprop(
   candidateloc,
   varloc = NULL,
   nloc,
+  npolls = NULL,
+  dateloc = NULL,
   election_data,
   cutoffs = c(-0.2, -0.1, -0.025, 0.025, 0.1, 0.2),
   groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue",
@@ -29,6 +31,10 @@ iterativegaussianmodelprop(
 \item{varloc}{the location of the variance if it is provided}
 
 \item{nloc}{the location of the sample sizes}
+
+\item{npolls}{the number of polls to include, default is all polls}
+
+\item{dateloc}{the location of the date used to determine the last npolls}
 
 \item{election_data}{the election data used to make the categorization decisions}
 

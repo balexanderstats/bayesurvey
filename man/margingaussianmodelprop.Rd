@@ -9,6 +9,8 @@ margingaussianmodelprop(
   stateloc,
   marginloc,
   npolls = NULL,
+  dateloc = NULL,
+  normalize = F,
   invgamma = F,
   v0 = NULL,
   a0 = NULL,
@@ -25,6 +27,12 @@ margingaussianmodelprop(
 \item{stateloc}{}
 
 \item{marginloc}{}
+
+\item{npolls}{the number of polls to include, default is all polls}
+
+\item{dateloc}{the location of the date used to determine the last npolls}
+
+\item{normalize}{whether or not to normalize poll date before margin is calculated}
 
 \item{invgamma}{}
 
@@ -45,4 +53,18 @@ margingaussianmodelprop(
 }
 \description{
 Title
+}
+\examples{
+require(politicaldata)
+elect2008  = subset(pres_results , year == 2008)
+elect2008$margin = elect2008$dem - elect2008$rep
+elect2012 = subset(pres_results , year == 2012)
+elect2012$margin = elect2012$dem - elect2012$rep
+electdata = data.frame("state" = elect2008$state, "2008" =  elect2008$margin, "2012" = elect2012$margin)
+data(polls2016)
+polls = polls2016[ complete.cases(polls2016[, c(2, 3, 12)]), ]
+stateloc  = which(colnames(polls) == "State")
+polls2016$margin = polls2016$Trump - polls2016$Clinton
+marginloc = which(colnames(polls2016) == "margin")
+margingaussianmodelprop(polls2016, stateloc = stateloc, marginloc = marginloc, election_data = electdata)
 }
