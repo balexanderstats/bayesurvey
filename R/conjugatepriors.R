@@ -8,6 +8,7 @@
 #' @param datavar data variance,  if null var is called to estimate it
 #' @param singlepoll if true it calculates the variance based on the sample size
 #' @param n approriate sample size
+#' @param logit if a logit transformation should be used
 #' @param invgamma a logical indicator of whether or not a inverse gamma prior for sigma is (T) or isn't included
 #' @param a0 prior a if invgamma is T
 #' @param b0 prior b if invgamma is T
@@ -23,9 +24,10 @@
 #' unigausscp(data1, 0.5, 0.05)
 #' unigausscp(data1[1], 0.5, 0.05, singlepoll = TRUE, n = n1)
 #' unigausscp(data1, 0.5, 1, invgamma = TRUE, a0 = 0.0001, b0 = 0.0001)
+#' unigausscp(data1, 0.5, 1, logit = T, invgamma = TRUE, a0 = 0.0001, b0 = 0.0001)
 #' 
 #' 
-unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = FALSE,  n = NULL, invgamma = F, a0 = NULL, b0 = NULL){
+unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = FALSE,  n = NULL, logit = F, invgamma = F, a0 = NULL, b0 = NULL){
   #checks that n is the number of polls if singlepoll = F
   if(!is.null(n)){
     if(singlepoll == F  & n != length(data)){
@@ -40,7 +42,15 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = FA
   
   #generates n if not provided
   if(is.null(n)){
-    n = length(data)
+    if(singlepoll == F){
+      n = length(data)
+    }
+    if(singlepoll == T){
+      stop("N must be provided for single poll analysis")
+    }
+  }
+  if(logit == T){
+    data = log(data/(1-data))
   }
   #gets datavar for a single poll or multiple polls if datavar is not provided
   if(is.null(datavar)){
@@ -89,16 +99,45 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = FA
       ssqdata = sum(data^2)
     }
     #calculates posterior for v
-    postv = 1/(1/priorvar + n)
-    #calculates posterior for the mean
-    postmean = (priormean/priorvar + n * datamean) * postv
+    postv = 1/(1/priorvar + n) 
+    #calculates posterior for the mean post mu refers to the mean of the conditional distribution
+    postmu= (priormean/priorvar + n * datamean) * postv
     #calculates posterior a and b
     posta = a0 + n/2
-    postb = b0 + 0.5 * (priormean^2 /priorvar + ssqdata - postmean^2/postv)
+    postb = b0 + 0.5 * (priormean^2 /priorvar + ssqdata - postmu^2/postv)
     #calculates the posterior variance
-    postvar = postb / ((posta - 1)*postv)
+    postvn = postb / ((posta - 1)*postv)
+    varsampled = rinvgamma(10000, shape = posta, scale = postb)
+    #step 2 sample x
+    xsampled = rnorm(10000, mean = postmu, sd = sqrt(varsampled))
+    #step 3 estimate mean
+    postmean = mean(xsampled)
+    #step 4 estimate variance
+    postvar = mean(xsampled^2 - postmean^2)
+    
     #calculates the percent that the data plays in the weighted average of the mean
     dataweight = (n/postv)/(n/postv + (priorvar^-1)/postvar)
+  }
+  if(logit == T){
+    set.seed(5)
+    if(invgamma == T){
+      #step 1 sample variance
+      varsampled = rinvgamma(10000, shape = posta, scale = postb)
+      #step 2 sample x
+      xsampled = rnorm(10000, mean = postmean, sd = sqrt(varsampled))
+      #step 3 estimate mean
+      postmean = mean(exp(xsampled)/(1+exp(xsampled)))
+      #step 4 estimate variance
+      postvar = mean(exp(xsampled)/(1+exp(xsampled))^2 - postmean^2)
+    }
+    if(invgamma == F){
+      #step 1 sample x
+      xsampled = rnorm(10000, mean = postmean, sd = sqrt(postvar))
+      #step 2 estimate mean
+      postmean = mean(exp(xsampled)/(1+exp(xsampled)))
+      #step 3 estimate variance
+      postvar = mean(exp(xsampled)/(1+exp(xsampled))^2 - postmean^2)
+    }
   }
   postsd = sqrt(postvar)
   return(list(priormean  = priormean,  priorvar = priorvar, postv = postv, a0 = a0, b0 = b0,  n = n, datavar = datavar, invgamma = invgamma, postmean = postmean, postvar = postvar, postsd = postsd, posta = posta,  postb = postb, dataweight = dataweight))
