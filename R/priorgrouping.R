@@ -7,7 +7,6 @@
 #' @param cutoffs the cutoffs used to split the data into the categories
 #' @param groupnames labels for the categories
 #' @param weights optional weights for a weighted average of the columns
-#'
 #' @return a data frame with the state in one column and the assignment in the other.
 #' @export
 
@@ -54,6 +53,7 @@ getpriorassign = function(election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1,
 #' @param election_data the election data in df form. The first column must contain the name of that state. 
 #' @param cutoffs the cutoffs used to split the data into the categories
 #' @param groupnames labels for the categories
+#' @param logit if a logit transformation for the prior means is desired
 #' @return poll_data with the prior category appended at the end
 #' @export
 
@@ -74,7 +74,7 @@ getpriorassign = function(election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1,
 #' newcutoff = c(-.15, -.1, -0.05, 0.05, .1, .15)
 #' addcategorytopolls(propnormpolls2, 30, 18, electdata, cutoffs = newcutoff)
 
-addcategorytopolls = function(poll_data, proploc, stateloc, election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1, .2), groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue", "Strong Blue")){
+addcategorytopolls = function(poll_data, proploc, stateloc, election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1, .2), groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue", "Strong Blue"), logit = F){
   assignment = getpriorassign(election_data, cutoffs, groupnames)
   categories  = length(groupnames)
   priormean = rep(NA, categories)
@@ -84,6 +84,9 @@ addcategorytopolls = function(poll_data, proploc, stateloc, election_data, cutof
     statenames = assignment[which(assignment[ , 2] == groupnames[i]) , 1]
     priorcat[which(poll_data[, stateloc] %in% statenames)] = groupnames[i]
     polls_temp = poll_data[priorcat == groupnames[i], ]
+    if(logit == T){
+      polls_temp[, proploc] = log(polls_temp[, proploc]/(1-polls_temp[, proploc]))
+    }
     priormean[i] = mean(polls_temp[ ,proploc])
     priorvar[i] = var(polls_temp[, proploc])
   }
