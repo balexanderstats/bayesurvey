@@ -127,6 +127,7 @@ iterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidateloc
 #' @param v0 the hyperparameter for the shift parameter of a normal gamma distribution (mean, v0, a, b)
 #' @param a0 the hyperparameter for the a paramater of a normal gamma distribution (mean, v0, a, b)
 #' @param b0 the hyperparameter for the b parameter of a normal gamma distribution (mean, v0, a, b)
+#' @param logit if a logit transformation is done.
 #' @param election_data the election data used to make the categorization decisions
 #' @param cutoffs the cutoffs to assign the prior categories
 #' @param groupnames  the names of the prior categories
@@ -149,7 +150,10 @@ iterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidateloc
 #' noniterativegaussianmodelprop(polls, stateloc, c(2,3),  3, nloc = nloc, election_data = electdata)
 #' noniterativegaussianmodelprop(polls, stateloc, c(2,3),  3, dateloc = 9, nloc = nloc, election_data = electdata, npolls = 10)
 #' noniterativegaussianmodelprop(polls, stateloc, c(2,3), 3, nloc = nloc, invgamma = TRUE, v0 = 1, a0 = 0.0001, b0=0.0001, election_data = electdata)
-noniterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidateloc,  varloc = NULL, nloc, npolls = NULL, dateloc = NULL, invgamma = F, v0 = NULL,  a0 = NULL, b0 = NULL, election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1, .2), groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue", "Strong Blue")){
+#' noniterativegaussianmodelprop(polls, stateloc, c(2,3), 3, nloc = nloc, invgamma = TRUE, v0 = 1, a0 = 0.0001, b0=0.0001, logit = T, election_data = electdata)
+
+
+noniterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidateloc,  varloc = NULL, nloc, npolls = NULL, dateloc = NULL, invgamma = F, v0 = NULL,  a0 = NULL, b0 = NULL, logit = F, election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1, .2), groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue", "Strong Blue")){
   #step 1 get prior assignments
   
   #normalizes the polling data
@@ -157,6 +161,7 @@ noniterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidate
   #gets the list of state names
   statenames = unique(election_data[ , 1])
   statenum = length(statenames)
+
   
   #implementing last n polls
   #Step 1: Loop over states
@@ -180,7 +185,7 @@ noniterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidate
     newdf = newdf[newdf$X %in% lastpolls, ]
   }
   #calls function to add the prior category to polls
-  priorout = addcategorytopolls(newdf, candidateloc,  stateloc, election_data, cutoffs, groupnames)
+  priorout = addcategorytopolls(newdf, candidateloc,  stateloc, election_data, cutoffs, groupnames, logit = logit)
   
   #saves data frame with the categories
   finaldf = priorout$new_poll_data
@@ -205,8 +210,16 @@ noniterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidate
       priorassign = getpriorassign(election_data = election_data, cutoffs = cutoffs, groupnames = groupnames)
       groupnametemp = priorassign[priorassign[, 1] == statenames[i] , 2] 
       groupnameloc = which(groupnames == groupnametemp, arr.ind = T)
-      postmeans[i] = priormeans[groupnameloc]
-      postvars[i] = priorvars[groupnameloc]
+      if(logit == F){
+        postmeans[i] = priormeans[groupnameloc]
+        postvars[i] = priorvars[groupnameloc]
+      }
+      if(logit == T){
+        polls_tempgroup = finaldf[finaldf$priorcat == groupnametemp, ]
+        postmeans[i] = mean(polls_tempgroup[ ,proploc])
+        postvars[i] = var(polls_tempgroup[, proploc])
+      }
+      
     }
     
     else{
@@ -221,11 +234,12 @@ noniterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidate
       print(i)
     }
     #runs model
-    postout = unigausscp(poll_temp[, candidateloc], priormeantemp, priorvartemp, invgamma = invgamma, a0 = a0, b0 = b0)
+    postout = unigausscp(poll_temp[, candidateloc], priormeantemp, priorvartemp,logit = logit, invgamma = invgamma, a0 = a0, b0 = b0)
     postmeans[i] = postout$postmean
     postvars[i] = postout$postvar
     }
   }
+
   postsd = sqrt(postvars)
   return(data.frame("State" = statenames, "Posterior Mean" = postmeans, "Posterior Variance" = postvars, "Posterior Standard Deviation" = postsd))
 }
