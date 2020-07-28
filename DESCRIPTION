@@ -1,7 +1,7 @@
 Package: bayesurvey
 Type: Package
 Title: Bayesian Conjugate Prior Analysis of Survey Data
-Version: 1.3
+Version: 1.4
 Date: 2019-12-06
 Author: Brittany Alexander
 Maintainer: Brittany Alexander <brittany@stat.tamu.edu>

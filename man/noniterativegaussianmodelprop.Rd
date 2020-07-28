@@ -19,6 +19,7 @@ noniterativegaussianmodelprop(
   v0 = NULL,
   a0 = NULL,
   b0 = NULL,
+  logit = F,
   election_data,
   cutoffs = c(-0.2, -0.1, -0.025, 0.025, 0.1, 0.2),
   groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue",
@@ -50,6 +51,8 @@ noniterativegaussianmodelprop(
 
 \item{b0}{the hyperparameter for the b parameter of a normal gamma distribution (mean, v0, a, b)}
 
+\item{logit}{if a logit transformation is done.}
+
 \item{election_data}{the election data used to make the categorization decisions}
 
 \item{cutoffs}{the cutoffs to assign the prior categories}
@@ -76,8 +79,9 @@ polls = polls2016[complete.cases(polls2016[, c(2, 3, 12)]), ]
 head(polls)
 nloc = which(colnames(polls2016) == "observations")
 stateloc  = which(colnames(polls) == "State")
-dateloc =  which(colnames(polls) == end_date)
+dateloc =  which(colnames(polls) == "end_date")
 noniterativegaussianmodelprop(polls, stateloc, c(2,3),  3, nloc = nloc, election_data = electdata)
 noniterativegaussianmodelprop(polls, stateloc, c(2,3),  3, dateloc = 9, nloc = nloc, election_data = electdata, npolls = 10)
 noniterativegaussianmodelprop(polls, stateloc, c(2,3), 3, nloc = nloc, invgamma = TRUE, v0 = 1, a0 = 0.0001, b0=0.0001, election_data = electdata)
+noniterativegaussianmodelprop(polls, stateloc, c(2,3), 3, nloc = nloc, invgamma = TRUE, v0 = 1, a0 = 0.0001, b0=0.0001, logit = T, election_data = electdata)
 }

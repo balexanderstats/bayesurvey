@@ -8,6 +8,8 @@ margingaussianmodelprop(
   poll_data,
   stateloc,
   marginloc,
+  nloc,
+  proploc = NULL,
   npolls = NULL,
   dateloc = NULL,
   normalize = F,

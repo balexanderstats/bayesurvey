@@ -12,7 +12,8 @@ addcategorytopolls(
   election_data,
   cutoffs = c(-0.2, -0.1, -0.025, 0.025, 0.1, 0.2),
   groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue",
-    "Strong Blue")
+    "Strong Blue"),
+  logit = F
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ addcategorytopolls(
 \item{cutoffs}{the cutoffs used to split the data into the categories}
 
 \item{groupnames}{labels for the categories}
+
+\item{logit}{if a logit transformation for the prior means is desired}
 }
 \value{
 poll_data with the prior category appended at the end
