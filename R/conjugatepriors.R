@@ -77,6 +77,7 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = FA
     postv = NULL
     #calculates the percent that the data plays in the weighted average of the mean
     dataweight = (n * priorvar)/(n * priorvar + datavar)
+
     
   }
   # Includes inverse gamma prior
@@ -107,28 +108,32 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = FA
     postb = b0 + 0.5 * (priormean^2 /priorvar + ssqdata - postmu^2/postv)
     #calculates the posterior variance
     postvn = postb / ((posta - 1)*postv)
-    varsampled = rinvgamma(10000, shape = posta, scale = postb)
-    #step 2 sample x
-    xsampled = rnorm(10000, mean = postmu, sd = sqrt(varsampled))
-    #step 3 estimate mean
-    postmean = mean(xsampled)
-    #step 4 estimate variance
-    postvar = mean(xsampled^2 - postmean^2)
+    if(logit == F){
+      varsampled = rinvgamma(10000, shape = posta, scale = postb)
+      #step 2 sample x
+      xsampled = rnorm(10000, mean = postmu, sd = sqrt(varsampled))
+      #step 3 estimate mean
+      postmean = mean(xsampled)
+      #step 4 estimate variance
+      postvar = mean(xsampled^2 - postmean^2)
+    }
     
     #calculates the percent that the data plays in the weighted average of the mean
-    dataweight = (n/postv)/(n/postv + (priorvar^-1)/postvar)
+    dataweight = (n/postv)/(n/postv + (priorvar^-1)/postvn)
   }
+
+
   if(logit == T){
     set.seed(5)
     if(invgamma == T){
       #step 1 sample variance
       varsampled = rinvgamma(10000, shape = posta, scale = postb)
       #step 2 sample x
-      xsampled = rnorm(10000, mean = postmean, sd = sqrt(varsampled))
+      xsampled = rnorm(10000, mean = postmu, sd = sqrt(varsampled))
       #step 3 estimate mean
       postmean = mean(exp(xsampled)/(1+exp(xsampled)))
       #step 4 estimate variance
-      postvar = mean(exp(xsampled)/(1+exp(xsampled))^2 - postmean^2)
+      postvar = mean((exp(xsampled)/(1+exp(xsampled)))^2 - postmean^2)
     }
     if(invgamma == F){
       #step 1 sample x
@@ -136,7 +141,7 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = FA
       #step 2 estimate mean
       postmean = mean(exp(xsampled)/(1+exp(xsampled)))
       #step 3 estimate variance
-      postvar = mean(exp(xsampled)/(1+exp(xsampled))^2 - postmean^2)
+      postvar = mean((exp(xsampled)/(1+exp(xsampled)))^2 - postmean^2)
     }
   }
   postsd = sqrt(postvar)
