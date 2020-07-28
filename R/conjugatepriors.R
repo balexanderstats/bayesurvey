@@ -77,8 +77,9 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = FA
     postv = NULL
     #calculates the percent that the data plays in the weighted average of the mean
     dataweight = (n * priorvar)/(n * priorvar + datavar)
-
-    
+    cilow = postmean - 1.96*sqrt(postvar)
+    cihigh = postmean + 1.96*sqrt(postvar)
+    winprob = pnorm(.5, mean = postmean, sd = sqrt(postvar))
   }
   # Includes inverse gamma prior
   #adds a prior distribution and posterior of sigma
@@ -116,6 +117,9 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = FA
       postmean = mean(xsampled)
       #step 4 estimate variance
       postvar = mean(xsampled^2 - postmean^2)
+      cilow = quantile(xsampled, 0.025)
+      cihigh = quantile(xsampled, 0.975)
+      winprob = sum(xsampled > 0.5)/10000
     }
     
     #calculates the percent that the data plays in the weighted average of the mean
@@ -134,6 +138,9 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = FA
       postmean = mean(exp(xsampled)/(1+exp(xsampled)))
       #step 4 estimate variance
       postvar = mean((exp(xsampled)/(1+exp(xsampled)))^2 - postmean^2)
+      cilow = quantile((exp(xsampled)/(1+exp(xsampled)))^2 - postmean^2, 0.025)
+      cihigh = quantile((exp(xsampled)/(1+exp(xsampled)))^2 - postmean^2, 0.975)
+      winprob = sum((exp(xsampled)/(1+exp(xsampled)))^2 - postmean^2 > 0.5)/10000
     }
     if(invgamma == F){
       #step 1 sample x
@@ -142,10 +149,13 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = FA
       postmean = mean(exp(xsampled)/(1+exp(xsampled)))
       #step 3 estimate variance
       postvar = mean((exp(xsampled)/(1+exp(xsampled)))^2 - postmean^2)
+      cilow = quantile((exp(xsampled)/(1+exp(xsampled)))^2 - postmean^2, 0.025)
+      cihigh = quantile((exp(xsampled)/(1+exp(xsampled)))^2 - postmean^2, 0.975)
+      winprob = sum((exp(xsampled)/(1+exp(xsampled)))^2 - postmean^2 > 0.5)/10000
     }
   }
   postsd = sqrt(postvar)
-  return(list(priormean  = priormean,  priorvar = priorvar, postv = postv, a0 = a0, b0 = b0,  n = n, datavar = datavar, invgamma = invgamma, postmean = postmean, postvar = postvar, postsd = postsd, posta = posta,  postb = postb, dataweight = dataweight))
+  return(list(priormean  = priormean,  priorvar = priorvar, postv = postv, a0 = a0, b0 = b0,  n = n, datavar = datavar, invgamma = invgamma, postmean = postmean, postvar = postvar, postsd = postsd, cilow = cilow, cihigh = cihigh, winprob = winprob, posta = posta,  postb = postb, dataweight = dataweight))
 }
 
 
