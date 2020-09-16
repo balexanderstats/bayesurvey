@@ -91,7 +91,7 @@ addcategorytopolls = function(poll_data, proploc, stateloc, election_data, cutof
     priorvar[i] = var(polls_temp[, proploc])
   }
   newdf = cbind(poll_data, priorcat)
-  return(list(new_poll_data = newdf, priorcat = priorcat, priormean = priormean, priorvar = priorvar))  
+  return(list(new_poll_data = newdf, priorcat = priorcat,assignment = assignment, priormean = priormean, priorvar = priorvar))  
 }
 
 
