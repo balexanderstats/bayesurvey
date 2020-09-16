@@ -138,9 +138,9 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = FA
       postmean = mean(exp(xsampled)/(1+exp(xsampled)))
       #step 4 estimate variance
       postvar = mean((exp(xsampled)/(1+exp(xsampled)))^2 - postmean^2)
-      cilow = quantile((exp(xsampled)/(1+exp(xsampled)))^2 - postmean^2, 0.025)
-      cihigh = quantile((exp(xsampled)/(1+exp(xsampled)))^2 - postmean^2, 0.975)
-      winprob = sum((exp(xsampled)/(1+exp(xsampled)))^2 - postmean^2 > 0.5)/10000
+      cilow = quantile(exp(xsampled)/(1+exp(xsampled)), 0.025)
+      cihigh = quantile(exp(xsampled)/(1+exp(xsampled)), 0.975)
+      winprob = sum(exp(xsampled)/(1+exp(xsampled)) > 0.5)/10000
     }
     if(invgamma == F){
       #step 1 sample x
@@ -149,9 +149,9 @@ unigausscp = function(data, priormean, priorvar, datavar = NULL, singlepoll = FA
       postmean = mean(exp(xsampled)/(1+exp(xsampled)))
       #step 3 estimate variance
       postvar = mean((exp(xsampled)/(1+exp(xsampled)))^2 - postmean^2)
-      cilow = quantile((exp(xsampled)/(1+exp(xsampled)))^2 - postmean^2, 0.025)
-      cihigh = quantile((exp(xsampled)/(1+exp(xsampled)))^2 - postmean^2, 0.975)
-      winprob = sum((exp(xsampled)/(1+exp(xsampled)))^2 - postmean^2 > 0.5)/10000
+      cilow = quantile(exp(xsampled)/(1+exp(xsampled)), 0.025)
+      cihigh = quantile(exp(xsampled)/(1+exp(xsampled)), 0.975)
+      winprob = sum(exp(xsampled)/(1+exp(xsampled)) > 0.5)/10000
     }
   }
   postsd = sqrt(postvar)
