@@ -123,6 +123,7 @@ iterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidateloc
 #' @param nloc the location of the sample sizes
 #' @param npolls the number of polls to include, default is all polls
 #' @param dateloc the location of the date used to determine the last npolls
+#' @param idloc the location of an id variable (necessary when npoll isn't null)
 #' @param invgamma an indicator if an inverse gamma model is fit
 #' @param v0 the hyperparameter for the shift parameter of a normal gamma distribution (mean, v0, a, b)
 #' @param a0 the hyperparameter for the a paramater of a normal gamma distribution (mean, v0, a, b)
@@ -153,7 +154,7 @@ iterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidateloc
 #' noniterativegaussianmodelprop(polls, stateloc, c(2,3), 3, nloc = nloc, invgamma = TRUE, v0 = 1, a0 = 0.0001, b0=0.0001, logit = T, election_data = electdata)
 
 
-noniterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidateloc,  varloc = NULL, nloc, npolls = NULL, dateloc = NULL, invgamma = F, v0 = NULL,  a0 = NULL, b0 = NULL, logit = F, election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1, .2), groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue", "Strong Blue")){
+noniterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidateloc,  varloc = NULL, nloc, npolls = NULL, dateloc = NULL, idloc = NULL, invgamma = F, v0 = NULL,  a0 = NULL, b0 = NULL, logit = F, election_data, cutoffs = c(-.2,-.1, -0.025, 0.025, .1, .2), groupnames = c("Strong Red", "Red", "Lean Red", "Competitive", "Lean Blue", "Blue", "Strong Blue")){
   #step 1 get prior assignments
   
   #normalizes the polling data
@@ -172,17 +173,17 @@ noniterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidate
       poll_temp = subset(newdf, newdf[, stateloc] == statenames[i])
       poll_temp = poll_temp[order(poll_temp[, dateloc], decreasing = T), ]
       if(nrow(poll_temp) > npolls){
-        lastpolls = c(lastpolls, poll_temp$X[1:npolls])
+        lastpolls = c(lastpolls, poll_temp[1:npolls, idloc])
       }
       else{
-        lastpolls = c(lastpolls, poll_temp$X)
+        lastpolls = c(lastpolls, poll_temp[, idloc])
       }
       
       #Step 3: redefine poll data
       #go through original 
       
     }
-    newdf = newdf[newdf$X %in% lastpolls, ]
+    newdf = newdf[newdf[, idloc] %in% lastpolls, ]
   }
   #calls function to add the prior category to polls
   priorout = addcategorytopolls(newdf, candidateloc,  stateloc, election_data, cutoffs, groupnames, logit = logit)
@@ -202,6 +203,9 @@ noniterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidate
   #initialize posterior mean and variance
   postmeans = rep(NA, statenum)
   postvars = rep(NA, statenum)
+  cilow = rep(NA, statenum)
+  cihigh = rep(NA, statenum)
+  winprob = rep(NA, statenum)
   
   for(i in 1:statenum){
     #subset the data to get only polls of one state
@@ -212,12 +216,19 @@ noniterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidate
       groupnameloc = which(groupnames == groupnametemp, arr.ind = T)
       if(logit == F){
         postmeans[i] = priormeans[groupnameloc]
-        postvars[i] = priorvars[groupnameloc]
+        postvars[i] = priorout$priorvar[groupnameloc]
+        cilow[i] = postmeans[i] - 1.96*sqrt(postvars[i])
+        cihigh[i] = postmeans[i] + 1.96*sqrt(postvars[i])
+        winprob[i] = pnorm(.5, mean  = postmeans[i], sd = sqrt(postvars[i]))
       }
       if(logit == T){
         polls_tempgroup = finaldf[finaldf$priorcat == groupnametemp, ]
-        postmeans[i] = mean(polls_tempgroup[ ,proploc])
-        postvars[i] = var(polls_tempgroup[, proploc])
+        postmeans[i] = mean(polls_tempgroup[ ,candidateloc])
+        postvars[i] = var(polls_tempgroup[, candidateloc])
+        cilow[i] = postmeans[i] - 1.96*sqrt(postvars[i])
+        cihigh[i] = postmeans[i] + 1.96*sqrt(postvars[i])
+        winprob[i] = pnorm(.5, mean  = postmeans[i], sd = sqrt(postvars[i]))
+        
       }
       
     }
@@ -237,11 +248,16 @@ noniterativegaussianmodelprop = function(poll_data, stateloc, proploc, candidate
     postout = unigausscp(poll_temp[, candidateloc], priormeantemp, priorvartemp,logit = logit, invgamma = invgamma, a0 = a0, b0 = b0)
     postmeans[i] = postout$postmean
     postvars[i] = postout$postvar
+    cilow[i] = postout$cilow
+    cihigh[i] = postout$cihigh
+    winprob[i] = postout$winprob
     }
+    #
+    ciwidth = (cihigh -cilow)/2
   }
 
   postsd = sqrt(postvars)
-  return(data.frame("State" = statenames, "Posterior Mean" = postmeans, "Posterior Variance" = postvars, "Posterior Standard Deviation" = postsd))
+  return(data.frame("State" = statenames, "Posterior Mean" = postmeans, "Posterior Variance" = postvars, "Posterior Standard Deviation" = postsd, "Credible Interval Low" = cilow, "Credible Interval High" = cihigh, "Margin of Error" = ciwidth, "Win Probability" = winprob))
 }
 
 
